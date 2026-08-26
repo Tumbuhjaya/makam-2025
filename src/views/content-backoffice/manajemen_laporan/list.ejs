@@ -1,0 +1,291 @@
+<% include ../../template-backoffice/header.ejs %>
+
+<!-- BEGIN PAGE CONTENT -->
+<div class="page-content">
+  <div class="header">
+    <h2><strong>Data Laporan</strong></h2>
+    <div class="breadcrumb-wrapper">
+      <ol class="breadcrumb">
+        <li><a href="/backoffice">Dashboard</a>
+        </li>
+        <li class="active">Data</li>
+      </ol>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      <div class="panel">
+        <div class="panel-header header-line">
+          <div class="alert alert-danger" role="alert">
+            <h6><strong>Pencarian berdasarkan tahun</strong></h6>
+            <div class="row">
+              <div class="col-md-12 col-lg-12">
+                <select class="form-control" name="" id="tahun">
+                  <option value="">-- Pilih Tahun --</option>
+                </select>
+                <button class="btn btn-primary btn-embossed" type="button" onclick="tahun()" style="margin-top: 15px;">Cari</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="panel-content pagination2">
+          <div class="row">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+              <div class="tab tab-light clearfix"> 
+                <!-- Nav tabs -->
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="active"><a href="#tab2-1" data-toggle="tab" aria-expanded="false" style="padding: 10px 15px;"><span class="font-custom" style="font-size: 14px;">LAPORAN PERMOHONAN</span></a></li>
+                    <li><a href="#tab2-2" data-toggle="tab" aria-expanded="false" style="padding: 10px 15px;"><span class="font-custom" style="font-size: 14px;">LAPORAN PERPANJANGAN</span></a></li>
+                </ul>
+                <!-- Tab panes -->
+                <div class="tab-content">
+                  <div role="tabpanel" class="tab-pane fade active in" id="tab2-1">
+                    <div class="row">
+                      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        <table class="table table-bordered table-striped table-hover" id="data">
+                          <thead>
+                            <tr>
+                              <td rowspan="2">TPU</td>
+                              <td colspan="2">Januari</td>
+                              <td colspan="2">Februari</td>
+                              <td colspan="2">Maret</td>
+                              <td colspan="2">April</td>
+                              <td colspan="2">Mei</td>
+                              <td colspan="2">Juni</td>
+                              <td colspan="2">Juli</td>
+                              <td colspan="2">Agustus</td>
+                              <td colspan="2">September</td>
+                              <td colspan="2">Oktober</td>
+                              <td colspan="2">November</td>
+                              <td colspan="2">Desember</td>
+                              <td colspan="2">Total</td>
+                            </tr>
+                            <tr>
+                              <td>Pemakaman</td>
+                              <td>Tumpang</td>
+                              <td>Pemakaman</td>
+                              <td>Tumpang</td>
+                              <td>Pemakaman</td>
+                              <td>Tumpang</td>
+                              <td>Pemakaman</td>
+                              <td>Tumpang</td>
+                              <td>Pemakaman</td>
+                              <td>Tumpang</td>
+                              <td>Pemakaman</td>
+                              <td>Tumpang</td>
+                              <td>Pemakaman</td>
+                              <td>Tumpang</td>
+                              <td>Pemakaman</td>
+                              <td>Tumpang</td>
+                              <td>Pemakaman</td>
+                              <td>Tumpang</td>
+                              <td>Pemakaman</td>
+                              <td>Tumpang</td>
+                              <td>Pemakaman</td>
+                              <td>Tumpang</td>
+                              <td>Pemakaman</td>
+                              <td>Tumpang</td>
+                              <td>Pemakaman</td>
+                              <td>Tumpang</td>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <% for(let i = 0 ;i<jan0[0].length ; i++){%>
+                              <tr>
+                                <td><%= jan0[0][i].nama_tpu%></td>
+                                <td><%if(jan0[0][i].x){%><%= jan0[0][i].x%><%}%></td>
+                                <td><%if(jan4[0][i].x){%><%= jan4[0][i].x%><%}%></td>
+                                <td><%if(feb0[0][i].x){%><%= feb0[0][i].x%><%}%></td>
+                                <td><%if(feb4[0][i].x){%><%= feb4[0][i].x%><%}%></td>
+                                <td><%if(mar0[0][i].x){%><%= mar0[0][i].x%><%}%></td>
+                                <td><%if(mar4[0][i].x){%><%= mar4[0][i].x%><%}%></td>
+                                <td><%if(apr0[0][i].x){%><%= apr0[0][i].x%><%}%></td>
+                                <td><%if(apr4[0][i].x){%><%= apr4[0][i].x%><%}%></td>
+                                <td><%if( mei0[0][i].x){%><%= mei0[0][i].x%><%}%></td>
+                                <td><%if( mei4[0][i].x){%><%= mei4[0][i].x%><%}%></td>
+                                <td><%if( jun0[0][i].x){%><%= jun0[0][i].x%><%}%></td>
+                                <td><%if( jun4[0][i].x){%><%= jun4[0][i].x%><%}%></td>
+                                <td><%if( jul0[0][i].x){%><%= jul0[0][i].x%><%}%></td>
+                                <td><%if( jul4[0][i].x){%><%= jul4[0][i].x%><%}%></td>
+                                <td><%if( ags0[0][i].x){%><%= ags0[0][i].x%><%}%></td>
+                                <td><%if( ags4[0][i].x){%><%= ags4[0][i].x%><%}%></td>
+                                <td><%if( sep0[0][i].x){%><%= sep0[0][i].x%><%}%></td>
+                                <td><%if( sep4[0][i].x){%><%= sep4[0][i].x%><%}%></td>
+                                <td><%if( okt0[0][i].x){%><%= okt0[0][i].x%><%}%></td>
+                                <td><%if( okt4[0][i].x){%><%= okt4[0][i].x%><%}%></td>
+                                <td><%if( nov0[0][i].x){%><%= nov0[0][i].x%><%}%></td>
+                                <td><%if( nov4[0][i].x){%><%= nov4[0][i].x%><%}%></td>
+                                <td><%if( des0[0][i].x){%><%= des0[0][i].x%><%}%></td>
+                                <td><%if( des4[0][i].x){%><%= des4[0][i].x%><%}%></td>
+                                <td><%if( total0[0][i].x){%><%= total0[0][i].x%><%}%></td>
+                                <td><%if( total4[0][i].x){%><%= total4[0][i].x%><%}%></td>
+                              </tr>
+                              <%}%>
+                            </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                 
+                  <div role="tabpanel" class="tab-pane fade" id="tab2-2">
+                    <div class="row">
+                      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        <table class="table table-bordered table-striped table-hover" id="data_perpanjangan">
+                          <thead>
+                            <tr>
+                              <td rowspan="2">TPU</td>
+                              <td colspan="2">Januari</td>
+                              <td colspan="2">Februari</td>
+                              <td colspan="2">Maret</td>
+                              <td colspan="2">April</td>
+                              <td colspan="2">Mei</td>
+                              <td colspan="2">Juni</td>
+                              <td colspan="2">Juli</td>
+                              <td colspan="2">Agustus</td>
+                              <td colspan="2">September</td>
+                              <td colspan="2">Oktober</td>
+                              <td colspan="2">November</td>
+                              <td colspan="2">Desember</td>
+                              <td colspan="2">Total</td>
+                            </tr>
+                            <tr>
+                              <td>Pemakaman</td>
+                              <td>Tumpang</td>
+                              <td>Pemakaman</td>
+                              <td>Tumpang</td>
+                              <td>Pemakaman</td>
+                              <td>Tumpang</td>
+                              <td>Pemakaman</td>
+                              <td>Tumpang</td>
+                              <td>Pemakaman</td>
+                              <td>Tumpang</td>
+                              <td>Pemakaman</td>
+                              <td>Tumpang</td>
+                              <td>Pemakaman</td>
+                              <td>Tumpang</td>
+                              <td>Pemakaman</td>
+                              <td>Tumpang</td>
+                              <td>Pemakaman</td>
+                              <td>Tumpang</td>
+                              <td>Pemakaman</td>
+                              <td>Tumpang</td>
+                              <td>Pemakaman</td>
+                              <td>Tumpang</td>
+                              <td>Pemakaman</td>
+                              <td>Tumpang</td>
+                              <td>Pemakaman</td>
+                              <td>Tumpang</td>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <% for(let i = 0 ;i<jan0p[0].length ; i++){%>
+                              <tr>
+                                <td><%= jan0p[0][i].nama_tpu%></td>
+                                <td><%if(jan0p[0][i].x){%><%= jan0p[0][i].x%><%}%></td>
+                                <td><%if(jan4p[0][i].x){%><%= jan4p[0][i].x%><%}%></td>
+                                <td><%if(feb0p[0][i].x){%><%= feb0p[0][i].x%><%}%></td>
+                                <td><%if(feb4p[0][i].x){%><%= feb4p[0][i].x%><%}%></td>
+                                <td><%if(mar0p[0][i].x){%><%= mar0p[0][i].x%><%}%></td>
+                                <td><%if(mar4p[0][i].x){%><%= mar4p[0][i].x%><%}%></td>
+                                <td><%if(apr0p[0][i].x){%><%= apr0p[0][i].x%><%}%></td>
+                                <td><%if(apr4p[0][i].x){%><%= apr4p[0][i].x%><%}%></td>
+                                <td><%if( mei0p[0][i].x){%><%= mei0p[0][i].x%><%}%></td>
+                                <td><%if( mei4p[0][i].x){%><%= mei4p[0][i].x%><%}%></td>
+                                <td><%if( jun0p[0][i].x){%><%= jun0p[0][i].x%><%}%></td>
+                                <td><%if( jun4p[0][i].x){%><%= jun4p[0][i].x%><%}%></td>
+                                <td><%if( jul0p[0][i].x){%><%= jul0p[0][i].x%><%}%></td>
+                                <td><%if( jul4p[0][i].x){%><%= jul4p[0][i].x%><%}%></td>
+                                <td><%if( ags0p[0][i].x){%><%= ags0p[0][i].x%><%}%></td>
+                                <td><%if( ags4p[0][i].x){%><%= ags4p[0][i].x%><%}%></td>
+                                <td><%if( sep0p[0][i].x){%><%= sep0p[0][i].x%><%}%></td>
+                                <td><%if( sep4p[0][i].x){%><%= sep4p[0][i].x%><%}%></td>
+                                <td><%if( okt0p[0][i].x){%><%= okt0p[0][i].x%><%}%></td>
+                                <td><%if( okt4p[0][i].x){%><%= okt4p[0][i].x%><%}%></td>
+                                <td><%if( nov0p[0][i].x){%><%= nov0p[0][i].x%><%}%></td>
+                                <td><%if( nov4p[0][i].x){%><%= nov4p[0][i].x%><%}%></td>
+                                <td><%if( des0p[0][i].x){%><%= des0p[0][i].x%><%}%></td>
+                                <td><%if( des4p[0][i].x){%><%= des4p[0][i].x%><%}%></td>
+                                <td><%if( total0p[0][i].x){%><%= total0p[0][i].x%><%}%></td>
+                                <td><%if( total4p[0][i].x){%><%= total4p[0][i].x%><%}%></td>
+                              </tr>
+                              <%}%>
+                            </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+    </div>  
+  </div>
+  <% include ../../template-backoffice/copyright.ejs %>
+</div>
+<!-- END PAGE CONTENT -->
+
+<% include ../../template-backoffice/footer.ejs %>
+
+<script type="text/javascript">
+  function tahun() {
+  console.log($('#tahun').val());
+  location.href = `/manajemen_laporan?tahun=${ $('#tahun').val()}`
+}
+  $(document).ready(function() {
+    for(let i = new Date().getFullYear()-5 ;i< new Date().getFullYear()+5; i++){
+      if (i =='<%= tahun%>' ) {
+        $('#tahun').append(`<option value="${i}" selected>${i}</option>`)
+
+      }else{
+        $('#tahun').append(`<option value="${i}">${i}</option>`)
+
+      }
+    }
+
+    $('#data').DataTable({
+      "language": {
+          "sProcessing":   "Sedang memproses...",
+          "sLengthMenu":   "_MENU_",
+          "sZeroRecords":  "Tidak ditemukan data yang sesuai",
+          "sInfo":         "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+          "sInfoEmpty":    "Menampilkan 0 sampai 0 dari 0 entri",
+          "sInfoFiltered": "(disaring dari _MAX_ entri keseluruhan)",
+          "sInfoPostFix":  "",
+          "sUrl":          "",
+          "oPaginate": {
+            "sFirst":    "Pertama",
+            "sPrevious": "Sebelumnya",
+            "sNext":     "Selanjutnya",
+            "sLast":     "Terakhir"
+          }
+      },
+      "columnDefs": [
+          { "width": "100px", "targets": 1}
+      ],
+    });
+  });
+  $('#data_perpanjangan').DataTable({
+      "language": {
+          "sProcessing":   "Sedang memproses...",
+          "sLengthMenu":   "_MENU_",
+          "sZeroRecords":  "Tidak ditemukan data yang sesuai",
+          "sInfo":         "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+          "sInfoEmpty":    "Menampilkan 0 sampai 0 dari 0 entri",
+          "sInfoFiltered": "(disaring dari _MAX_ entri keseluruhan)",
+          "sInfoPostFix":  "",
+          "sUrl":          "",
+          "oPaginate": {
+            "sFirst":    "Pertama",
+            "sPrevious": "Sebelumnya",
+            "sNext":     "Selanjutnya",
+            "sLast":     "Terakhir"
+          }
+      },
+      "columnDefs": [
+          { "width": "100px", "targets": 1}
+      ],
+    });
+</script>

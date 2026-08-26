@@ -1,0 +1,645 @@
+<!--  BACKUP ASLI SERVER BENAR -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="#" type="image/png">
+
+    <title>SK Ijin Penggunaan Tanah Makam / Pemakaman Jenazah</title>
+
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <style type="text/css">
+       /* Aturan Dasar */
+        body {
+            font-family: 'Times New Roman', sans-serif !important;
+            font-size: 12pt;
+            line-height: 1.25em;
+            margin: 0;
+            padding: 30mm 60mm;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            margin:0;
+            font-weight: normal;
+            font-size: 12pt;
+            line-height: 1.25em;
+            text-align: justify;
+        }
+
+        .w-100{
+            width: 100%;
+        }
+
+        .w-100-flex{
+            width: 100%;
+            display: flex;
+        }
+
+        .custom-border-table{
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        td{
+            vertical-align: top;
+        }
+
+        /* --- KONFIGURASI CETAK --- */
+        @media print {
+            /* Set Ukuran Kertas A4 Portrait */
+            @page {
+                size: A4 portrait;
+                margin: 12.5mm; /* Margin luar fisik kertas */
+            }
+
+            body {
+                background-color: white;
+                font-size: 12pt;
+                line-height: 1.25em;
+                margin: 0;
+                padding: 0;
+                font-family: 'Times New Roman', sans-serif !important;
+            }
+
+            .no-print {
+                display: none;
+            }
+
+            .print-container {
+                width: 100%;
+                border-collapse: collapse;
+            }
+
+            /* Header & Footer Fixed */
+            .header-content {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 100px;
+            }
+
+            .footer-content {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                height: 60px;
+                text-align: center;
+                font-size: 10pt;
+                color: #555;
+            }
+
+            /* Spacer agar konten utama tidak tertimpa header/footer fixed */
+            .header-space {
+                height: 0; 
+                background-color: pink;
+            }
+
+            .footer-space {
+                height: 18mm;
+                /* background-color: red; */
+            }
+
+            /* Memastikan gambar/warna latar ikut tercetak */
+            * {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+
+        /* Styling Tambahan (Visual) */
+        .line-bold {
+            border: none;
+            border-top: 3px solid black;
+            margin-top: 5px;
+        }
+
+        button {
+            padding: 10px 20px;
+            cursor: pointer;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            position: absolute;
+            top:30px;
+            right:30px;
+        }
+
+        .custom-capital {
+            display: inline-block; 
+            text-transform: lowercase
+        }
+
+        .custom-capital::first-letter {
+            text-transform: uppercase
+        }
+    </style>
+</head>
+
+<body>
+    <div class="no-print actions">
+        <button onclick="window.print()">Cetak Dokumen / Save PDF</button>
+    </div>
+    <table class="print-container">
+        <thead>
+            <tr>
+                <td>
+                    <div class="header-space">&nbsp;</div>
+                    <!-- <div class="header-content">
+                        <div class="kop-surat">
+                            <img src="https://via.placeholder.com/80" alt="Logo">
+                            <div class="instansi">
+                                <h2>PT. SOLUSI TEKNOLOGI INDONESIA</h2>
+                                <p>Jl. Jenderal Sudirman No. 45, Jakarta Selatan | Telp: (021) 555-1234</p>
+                            </div>
+                        </div>
+                        <hr class="line-bold">
+                    </div> -->
+                </td>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr>
+                <td>
+                    <div class="w-100" style="height: 25mm;background-color: ;">
+                        <img src="/images/template/kop_surat_disperkim_2026.jpg" alt="" style="width: 100%;">
+                    </div>
+
+                    <div class="w-100 no-print" style="height: 15mm;background-color:transparent ;"></div>
+
+                    <div class="w-100" style="margin-top: 5mm;">
+                        <h4 style="text-align: center;margin:2.5mm 0 0 0">KEPUTUSAN KEPALA DINAS PERUMAHAN DAN KAWASAN PERMUKIMAN</h4>
+                        <h4 style="text-align: center;">KOTA SEMARANG</h4>
+                        <h4 style="text-align: center;margin:2.5mm 0">NOMOR : <%=data[0].nomor_surat%></h4>
+                        <h4 style="text-align: center;margin:2.5mm 0">TENTANG</h4>
+                        <h4 style="text-align: center;margin:2.5mm 0 0 0"><strong>IJIN PENGGUNAAN TANAH MAKAM / PEMAKAMAN JENAZAH</strong></h4>
+                        <h4 style="text-align: center;">DI KOTA SEMARANG</h4>
+                        <h4 style="text-align: center;">KEPUTUSAN KEPALA DINAS PERUMAHAN DAN KAWASAN PERMUKIMAN KOTA SEMARANG</h4>
+                    </div>
+
+                    <div class="w-100" style="margin-top: 5mm;">
+                        <table border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;width:100%">
+                            <tbody>
+                                <tr>
+                                    <td style="width: 50mm;vertical-align:top">Memperhatikan</td>
+                                    <td style="vertical-align: top;width: 5mm;">:</td>
+                                    <td>
+                                        <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse;width:100%">
+                                            <tbody>
+                                                <tr>
+                                                    <td style="width: 50mm;vertical-align: top;">Surat Permohonan</td>
+                                                    <td style="width: 5mm;vertical-align: top;">:</td>
+                                                    <td style="vertical-align: top;"><%= data[0].nama_ahli_waris%></td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td style="vertical-align: top;">Tanggal</td>
+                                                    <td style="vertical-align: top;">:</td>
+                                                    <td style="vertical-align: top;"><%= data[0].inserted%></td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td style="vertical-align: top;">Alamat</td>
+                                                    <td style="vertical-align: top;">:</td>
+                                                    <td style="vertical-align: top;">
+                                                        <%= data[0].alamat_pemohon?data[0].alamat_pemohon:''%> <%if( data[0].domisili==0){%>Kelurahan <span style="color: #000 !important;"><%= data[0].kelurahan_pemohon?data[0].kelurahan_pemohon[0].toUpperCase()+data[0].kelurahan_pemohon.substring(1,data[0].kelurahan_pemohon.length).toLowerCase():''%></span> Kecamatan <span style="color: #000 !important;"><%=  data[0].kecamatan_pemohon?data[0].kecamatan_pemohon[0].toUpperCase()+data[0].kecamatan_pemohon.substring(1,data[0].kecamatan_pemohon.length).toLowerCase():''%>
+                                                        </span><%}%>
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td style="vertical-align: top;">Perihal</td>
+                                                    <td style="vertical-align: top;">:</td>
+                                                    <td style="vertical-align: top;">Ijin Pemakaman Jenazah</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="w-100" style="margin-top: 5mm;">
+                        <table border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;width:100%">
+                            <tbody>
+                                <tr>
+                                    <td style="width: 50mm;vertical-align:top">Menimbang</td>
+                                    <td style="vertical-align: top;width: 5mm;">:</td>
+                                    <td>
+                                        &nbsp;
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td style="width: 50mm;vertical-align:top">&nbsp;</td>
+                                    <td style="vertical-align: top;width: 5mm;">&nbsp;</td>
+                                    <td>
+                                        <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse;width:100%">
+                                            <tbody>
+                                                <tr>
+                                                    <td style="width: 10mm;vertical-align: top;">a.</td>
+                                                    <td style="vertical-align: top;text-align: justify;">bahwa permohonan ijin sebagaimana tersebut di atas telah memenuhi persyaratan dan ketentuan, maka Pemerintah Kota Semarang <strong>tidak keberatan memberikan ijin Penggunaan Tanah Makam / Pemakaman Jenazah</strong> dimaksud;
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td style="vertical-align: top;">b.</td>
+                                                    <td style="vertical-align: top;text-align: justify;">bahwa untuk melaksanakan maksud tersebut di atas, perlu diterbitkan keputusan Kepala Dinas Perumahan dan Kawasan Permukiman Kota Semarang.</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="w-100" style="margin-top: 5mm;">
+                        <table border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;width:100%">
+                            <tbody>
+                                <tr>
+                                    <td style="width: 50mm;vertical-align:top">Mengingat</td>
+                                    <td style="vertical-align: top;width: 5mm;">:</td>
+                                    <td>
+                                        &nbsp;
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td style="width: 50mm;vertical-align:top">&nbsp;</td>
+                                    <td style="vertical-align: top;width: 5mm;">&nbsp;</td>
+                                    <td>
+                                        <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse;width:100%">
+                                            <tbody>
+                                                <tr>
+                                                    <td style="width: 10mm;vertical-align: top;">1.</td>
+                                                    <td style="vertical-align: top;text-align:justify">
+                                                        Undang-undang Nomor 16 Tahun 1950 tentang Pembentukan Daerah – Daerah Kota Besar Dalam Lingkungan Provinsi Jawa Timur, Jawa Tengah, Jawa Barat dan Daerah Istimewa Yogyakarta (Himpunan Lembaran Negara Republik Indonesia Tahun 1950);
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td style="vertical-align: top;">2.</td>
+                                                    <td style="vertical-align: top;text-align:justify">Undang-undang Nomor 34 Tahun 2000 tentang Perubahan atas Undang-undang Nomor 18 Tahun 1997 tentang Pajak Daerah dan Retribusi Daerah (Lembaran Negara RI Tahun 2000 Nomor 246);
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td style="vertical-align: top;">3.</td>
+                                                    <td style="vertical-align: top;text-align:justify">Undang-undang Nomor 32 Tahun 2004 tentang Pemerintah Daerah (Lembaran Negara Republik Indonesia Nomor 4437) sebagaimana telah diubah dengan Undang-undang Nomor 8 Tahun 2005 tentang Penetapan Peraturan Pemerintah Pengganti Undang-undang Nomor 3 Tahun 2005 tentang Perubahan atas Undang-undang Nomor 32 Tahun 2004 Pemerintah Daerah menjadi Undang-undang (Lembaran Negara Republik Indonesia Tahun 2005 Nomor 108, Tambahan Lembaran Negara Republik Indonesia Nomor 4548);
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td style="vertical-align: top;">4.</td>
+                                                    <td style="vertical-align: top;text-align:justify">Peraturan Pemerintah Nomor 16 Tahun 1976 tentang Perluasan Kotamadya Daerah Tingkat II Semarang (Lembaran Negara Republik Indonesia Tahun 1976 Nomor 3079);
+
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td style="vertical-align: top;">5.</td>
+                                                    <td style="vertical-align: top;text-align:justify">Peraturan Pemerintah Nomor 50 Tahun 1992 tentang Pembentukan Kecamatan di wilayah Kabupaten-kabupaten Daerah Tingkat II Purbalingga, Cilacap, Wonogiri dan Kendal serta penataan kecamatan di wilayah Kotamadya Daerah Tingkat II Semarang dalam wilayah Provinsi Daerah Tingkat I Jawa Tengah (Lembaran Negara Republik Indonesia Tahun 1992 Nomor 89);
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td style="vertical-align: top;">6.</td>
+                                                    <td style="vertical-align: top;text-align:justify">Peraturan Daerah Kota Semarang Nomor 10 Tahun 2023 Tentang Pajak Daerah dan Retribusi Daerah;
+                                                    </td>
+                                                </tr>
+                                                    <tr>
+                                                    <td style="vertical-align: top;">7.</td>
+                                                    <td style="vertical-align: top;">Peraturan Wali kota (Perwal) Semarang Nomor 44 Tahun 2025 tentang Organisasi dan Tata Kerja Unit Pelaksana Teknis Dinas (UPTD) Pemakaman pada Dinas Perumahan dan Kawasan Permukiman
+                                                    </td>
+                                                </tr>
+                                                <!-- <tr>
+                                                    <td style="vertical-align: top;">7.</td>
+                                                    <td style="vertical-align: top;text-align:justify">Peraturan Daerah Kota Semarang Nomor 2 Tahun 2012 tentang Retribusi Jasa Umum di Kota Semarang;
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td style="vertical-align: top;">8.</td>
+                                                    <td style="vertical-align: top;text-align:justify">Peraturan Daerah Kota Semarang Nomor 14 Tahun 2016 tentang Pembentukan dan Satuan Perangkat Daerah Kota Semarang;
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td style="vertical-align: top;">9.</td>
+                                                    <td style="vertical-align: top;text-align:justify">Keputusan Walikota Semarang Nomor 65 Tahun 2016 tentang Penjabaran Tugas dan Fungsi Dinas Perumahan dan Kawasan Permukiman Kota Semarang Berita Acara Nomor 65;
+                                                    </td>
+                                                </tr> -->
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="w-100" style="margin-top: 5mm;">
+                        <h4 style="text-align: center;"><strong>MEMUTUSKAN :</strong></h4>
+                        <table border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;width:100%">
+                            <tbody>
+                                <tr>
+                                    <td style="width: 50mm;vertical-align:top">Menetapkan</td>
+                                    <td style="vertical-align: top;width: 5mm;">:</td>
+                                    <td>
+                                        &nbsp;
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td style="width: 50mm;vertical-align:top">PERTAMA</td>
+                                    <td style="vertical-align: top;width: 5mm;">:</td>
+                                    <td>
+                                        Memberikan Ijin Penggunaan Tanah Makam / Pemakaman Jenazah, kepada :
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>&nbsp;</td>
+                                    <td>&nbsp;</td>
+                                    <td>
+                                        <table border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;width:100%">
+                                            <tbody>
+                                                <tr>
+                                                    <td style="width: 40mm;vertical-align: top;">Nama</td>
+                                                    <td style="width: 2.5mm;vertical-align: top;">:</td>
+                                                    <td style="vertical-align: top;"><%= data[0].nama_ahli_waris%></td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td style="vertical-align: top;">Pekerjaan</td>
+                                                    <td style="vertical-align: top;">:</td>
+                                                    <td style="vertical-align: top;"><%= data[0].pekerjaan%></td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td style="vertical-align: top;">Alamat</td>
+                                                    <td style="vertical-align: top;">:</td>
+                                                    <td style="vertical-align: top;">
+                                                        <%= data[0].alamat_pemohon?data[0].alamat_pemohon:''%> <%if( data[0].domisili==0){%>Kelurahan <span style="color: #000 !important;"><%= data[0].kelurahan_pemohon?data[0].kelurahan_pemohon[0].toUpperCase()+data[0].kelurahan_pemohon.substring(1,data[0].kelurahan_pemohon.length).toLowerCase():''%></span> Kecamatan <span style="color: #000 !important;"><%=  data[0].kecamatan_pemohon?data[0].kecamatan_pemohon[0].toUpperCase()+data[0].kecamatan_pemohon.substring(1,data[0].kecamatan_pemohon.length).toLowerCase():''%>
+                                                        </span><%}%>
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td style="vertical-align: top;">Telp</td>
+                                                    <td style="vertical-align: top;">:</td>
+                                                    <td style="vertical-align: top;"><%= data[0].hp%></td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td style="vertical-align: top;">Email</td>
+                                                    <td style="vertical-align: top;">:</td>
+                                                    <td style="vertical-align: top;"><%= data[0].email%></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>&nbsp;</td>
+                                    <td>&nbsp;</td>
+                                    <td>
+                                        <table border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;width:100%">
+                                            <tbody>
+                                                <tr>
+                                                    <td colspan="3">Bagi jenazah almarhum/almarhumah :</td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="width: 40mm;vertical-align: top;">Nama</td>
+                                                    <td style="width: 2.5mm;vertical-align: top;">:</td>
+                                                    <td style="vertical-align: top;"><%= data[0].nama_jenazah%></td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td style="vertical-align: top;">Alamat Hidup</td>
+                                                    <td style="vertical-align: top;">:</td>
+                                                    <td style="vertical-align: top;">
+                                                        <%= data[0].alamat_jenazah%> <%if( data[0].domisili_jenazah==0){%>Kelurahan <span style="color: #000 !important;"><%= data[0].kelurahan_jenazah?data[0].kelurahan_jenazah[0].toUpperCase()+data[0].kelurahan_jenazah.substring(1,data[0].kelurahan_jenazah.length).toLowerCase():'' %></span> Kecamatan <span style="color: #000 !important;"><%= data[0].kecamatan_jenazah? data[0].kecamatan_jenazah[0].toUpperCase()+data[0].kecamatan_jenazah.substring(1,data[0].kecamatan_jenazah.length).toLowerCase():''%></span><%}%>
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td style="vertical-align: top;">Lokasi Makam</td>
+                                                    <td style="vertical-align: top;">:</td>
+                                                    <td style="vertical-align: top;"><%= data[0].alamat_makam%> <%=  data[0].keterangan_pengelola?' nomor liang tpu '+ data[0].keterangan_pengelola:''%></td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td style="vertical-align: top;">Tanggal Meninggal</td>
+                                                    <td style="vertical-align: top;">:</td>
+                                                    <td style="vertical-align: top;"><%= data[0].tanggal_meninggal%></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="w-100" style="margin-top: 5mm;">
+                        <table border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;width:100%">
+                            <tbody>
+
+                                <tr>
+                                    <td style="width: 50mm;vertical-align:top">KEDUA</td>
+                                    <td style="vertical-align: top;width: 5mm;">:</td>
+                                    <td>
+                                        Pemegang ijin dimaksud diktum PERTAMA harus memenuhi ketentuan sebagai berikut :
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>&nbsp;</td>
+                                    <td>&nbsp;</td>
+                                    <td>
+                                        <table border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;width:100%">
+                                            <tbody>
+                                                <tr>
+                                                    <td style="width: 10mm;vertical-align: top;">1.</td>
+                                                    <td style="vertical-align: top;text-align: justify;">Pemegang Ijin wajib mentaati semua ketentuan yang berlaku dan semua instruksi/petunjuk yang berwenang.</td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td style="vertical-align: top;">2.</td>
+                                                    <td style="vertical-align: top;text-align: justify;">Merawat kuburnya agar selalu tampak bersih dan teratur.</td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td style="vertical-align: top;">3.</td>
+                                                    <td style="vertical-align: top;text-align: justify;">Setiap petak makam tidak diijinkan didirikan bangunan dengan bentuk apapun kecuali tanda nisan atau batu nisan berbentuk trapesium.</td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td style="vertical-align: top;">4.</td>
+                                                    <td style="vertical-align: top;text-align: justify;">Pemindahan, dan atau pembongkaran/tumpang kerangka jenazah dapat dilakukan apabila telah dimakamkan paling singkat 3 (tiga) tahun.</strong>.
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td style="vertical-align: top;">5.</td>
+                                                    <td style="vertical-align: top;text-align: justify;">Surat Ijin Penggunaan Tanah Makam / Pemakaman Jenazah berlaku selama 3 (tiga) tahun dengan kewajiban melakukan perpanjangan setiap 3 (tiga) tahun diperpanjang.
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td style="vertical-align: top;">6.</td>
+                                                    <!-- <td style="vertical-align: top;">Surat Ijin Perpanjangan Penggunaan Tanah Makam berlaku sejak<i>Masa_berlaku_Awal</i> s/d <i>Masa_berlaku_Akhi</i>. -->
+                                                    <td style="vertical-align: top;text-align: justify;">Surat Ijin Penggunaan Tanah Makam berlaku sejak <strong><%= data[0].tanggal_surat%></strong> s/d <strong><%= data[0].tanggal_berlaku_surat%></strong>.
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td style="vertical-align: top;">7.</td>
+                                                    <td style="vertical-align: top;text-align: justify;">Apabila dalam jangka waktu 2 (dua) kali masa daftar ulang penggunaan tanah makam tidak dilakukan perpanjangan  maka petak makam dapat digunakan untuk pemakaman jenazah orang lain dan/atau dilakukan pembongkaran.
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td style="vertical-align: top;">8.</td>
+                                                    <td style="vertical-align: top;text-align: justify;">Jangka waktu 3 (tiga) tahun sebagaimana tersebut di atas sewaktu-waktu dapat ditinjau kembali apabila Pemerintah Kota Semarang menghendaki adanya penataan wilayah atau tuntutan keadaan.
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="w-100" style="margin-top: 5mm;">
+                        <table border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;width:100%">
+                            <tbody>
+                                <tr>
+                                    <td style="width: 50mm;vertical-align:top">KETIGA</td>
+                                    <td style="vertical-align: top;width: 5mm;">:</td>
+                                    <td>
+                                        Keputusan ini berlaku sejak tanggal ditetapkan
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="w-100" style="margin-top: 5mm;">
+                        <table border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;width: 100%;">
+                            <tbody>
+                                <tr>
+                                    <td style="width: 50%;">&nbsp;</td>
+                                    <td style="width: 50%;">
+                                        <table border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;width:100%;margin-bottom: 10mm;">
+                                            <tbody>
+                                                <tr>
+                                                    <td style="width: 35mm;">Ditetapkan di</td>
+                                                    <td style="width: 2.5mm;">:</td>
+                                                    <td>
+                                                        Semarang
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>Pada Tanggal</td>
+                                                    <td>:</td>
+                                                    <td><%= data[0].tanggal_surat%></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse;width:100%;">
+                            <tbody>
+                                <tr>
+                                    <td style="width: 50%;">&nbsp;</td>
+                                    <td style="text-align: left;width:50% ;">
+                                        An. KEPALA DINAS PERUMAHAN DAN KAWASAN PERMUKIMAN KOTA SEMARANG
+                                        <div style="width: 100%;height: 85px;display: flex;justify-content: flex-start;align-items: center;background-color: transparent;">
+                                            #
+                                        </div>
+                                        <span>"isi dengan nama penandatangan"</span>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>
+                                        <br/>
+                                        <br/>
+                                        Tembusan disampaikan kepada Yth. :
+                                        <table border="0" cellpadding="0" cellspacing="0" style="width: 100%;border-collapse:collapse">
+                                            <tr>
+                                                <td style="width: 10mm;">1.</td>
+                                                <td>Wali Kota Semarang</td>
+                                            </tr>
+
+                                            <tr>
+                                                <td>2.</td>
+                                                <td>Pertinggal</td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                    <td>&nbsp;</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+
+        <tfoot>
+            <tr>
+                <td>
+                    <div class="footer-space">&nbsp;</div>
+                    <div class="footer-content">
+                        <hr>
+                        <h6 style="text-align: center;">
+                            Dokumen ini ditandatangani secara elektronik menggunakan Sertifikat Elektronik yang diterbitkan oleh Balai Sertifikasi Elektronik (BSrE), Badan Siber dan Sandi Negara (BSSN)
+                        </h6>
+                    </div>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+    
+    <script type="text/javascript">
+        $('#btn-print').click(function () {
+            window.print();
+        });
+
+        
+    </script>
+</body>
+
+</html>

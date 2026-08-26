@@ -1,0 +1,108 @@
+<% include ../../template-backoffice/header.ejs %>
+
+<!-- BEGIN PAGE CONTENT -->
+<div class="page-content">
+  <div class="header">
+    <h2><strong>Data</strong></h2>
+    <div class="breadcrumb-wrapper">
+      <ol class="breadcrumb">
+        <li><a href="/backoffice">Dashboard</a>
+        </li>
+        <li class="active">Data</li>
+      </ol>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      <div class="panel">
+        <div class="panel-header header-line">
+           <a class="btn btn-primary btn-embossed" href="/manajemen_basic/insert" role="button"><i class="fa fa-plus" aria-hidden="true"></i>Tambah Data</a>
+        </div>
+        <div class="panel-content pagination2">
+          <table class="table table-bordered table-striped table-hover" id="data">
+            <thead>
+              <tr>
+                <th class="header">No.</th>
+                <th class="header">Id</th>
+                <th class="header">Option</th>
+              </tr>
+            </thead>
+            
+            <tbody>
+            <tr>
+              <td>-</td>
+              <td>-</td>
+
+              <td>
+                <center>
+                <ul class="list-inline" style="text-align: center;">
+                  <li><a class="btn btn-warning btn-embossed btn-sm" href="/manajemen_basic/edit/1" role="button" ><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a></li>
+                  <li class="separator">|</li>
+                  <li><a class="btn btn-danger btn-embossed btn-sm" href="#" role="button" onclick="return confirm('Apakah anda yakin untuk menghapus data ini ?');"><i class="fa fa-trash-o" aria-hidden="true"></i></a></li>
+                </ul>
+                </center>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>  
+  </div>
+  <div class="footer">
+    <div class="copyright">
+      <p class="pull-left sm-pull-reset">
+        <span>Copyright <span class="copyright">©</span> 2021 </span>
+        <span>Pemerintah</span>.
+      </p>
+    </div>
+  </div>
+</div>
+<!-- END PAGE CONTENT -->
+
+<% include ../../template-backoffice/footer.ejs %>
+
+<script type="text/javascript">
+let data_table=    $('#data').DataTable({
+      "language": {
+          "sProcessing":   "Sedang memproses...",
+          "sLengthMenu":   "_MENU_",
+          "sZeroRecords":  "Tidak ditemukan data yang sesuai",
+          "sInfo":         "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+          "sInfoEmpty":    "Menampilkan 0 sampai 0 dari 0 entri",
+          "sInfoFiltered": "(disaring dari _MAX_ entri keseluruhan)",
+          "sInfoPostFix":  "",
+          "sUrl":          "",
+          "oPaginate": {
+            "sFirst":    "Pertama",
+            "sPrevious": "Sebelumnya",
+            "sNext":     "Selanjutnya",
+            "sLast":     "Terakhir"
+          }
+      },
+       "ajax":  `/peta/floor_plan`,
+           "columns": [
+               { "data": null},
+               { "data": "objectid"},
+               { "data": "objectid",render: function(data){
+                let a = ''
+                if (data) {
+                    a = `
+                <ul class="list-inline text-center mb-0">
+                  <li class="list-inline-item"><a href="/manajemen_basic/edit/${data}" class="btn btn-warning"><i class="fa fa-pencil-square-o"></i></a></li>
+                </ul>`
+                }
+                return `<td><center>${a}</center></td>`
+               }},
+         ],
+      "columnDefs": [
+          { "width": "100px", "targets": 1}
+      ],
+    });
+    data_table.on( 'draw.dt', function () {
+    let PageInfo = $('#data').DataTable().page.info();
+    data_table.column(0, { page: 'current' }).nodes().each( function (cell, i) {
+            cell.innerHTML = i + 1 + PageInfo.start;
+        } );
+    } );
+</script>

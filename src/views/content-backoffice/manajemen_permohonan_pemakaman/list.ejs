@@ -1,0 +1,151 @@
+<% include ../../template-backoffice/header.ejs %>
+
+<!-- BEGIN PAGE CONTENT -->
+<div class="page-content">
+  <div class="header">
+    <h2><strong>Data Permohonan Ijin Pemakaman Jenazah</strong></h2>
+    <div class="breadcrumb-wrapper">
+      <ol class="breadcrumb">
+        <li><a href="/backoffice">Dashboard</a>
+        </li>
+        <li class="active">Data</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      <div class="panel">
+        <div class="panel-header header-line">
+          <div class="alert alert-danger" role="alert">
+            <h6><strong>Pencarian berdasarkan status permohonan</strong></h6>
+            <div class="row">
+              <div class="col-md-12 col-lg-12">
+                <select name="" id="verifikasi" class="form-control">
+                  <option value="">-- Pilih --</option>
+                    <option value="0">Belum Diverifikasi</option>
+                    <option value="1">Revisi</option>
+                    <option value="4">Di Revisi oleh User </option>
+                    <!-- <option value="3">Dibatalkan</option> -->
+                </select>
+
+                <button class="btn btn-primary btn-embossed" onclick="cari()" style="margin-top: 15px;">Cari</button>
+              </div>
+            </div>
+          </div>
+
+           <a class="btn btn-primary btn-embossed" href="/manajemen_permohonan/pemakaman/insert" role="button"><i class="fa fa-plus" aria-hidden="true"></i>Tambah Data</a>
+              <!-- <button class="btn btn-primary btn-block" data-toggle="modal" data-target="#exampleModal" >Daftar Permohonan</button> -->
+          </div>
+        <div class="panel-content pagination2 table-responsive">
+          <table class="table table-bordered table-striped table-hover" id="data">
+      <thead>
+        <tr>
+          <th rowspan="2">No.</th>
+          <th rowspan="2">Tanggal Permohonan</th>
+          <th rowspan="2">Kode Registrasi</th>
+          <th rowspan="2">Nama Pemohon/Ahli Waris</th>
+          <th rowspan="2">Nama Jenazah</th>
+          <th colspan="2" style="text-align: center;">Tanggal</th>
+          <th colspan="4" style="text-align: center;">Lokasi Pemakaman</th> <th colspan="3" style="text-align: center;">Retribusi & Pembayaran</th>
+          <th rowspan="2">Status Permohonan</th>
+          <th rowspan="2">Option</th>
+        </tr>
+        <tr>
+          <th>Meninggal</th>
+          <th>Dimakamkan</th>
+          <th>Kecamatan</th>
+          <th>Lokasi</th>
+          <th>Blok</th>
+          <th>Sub Blok</th>
+          <th>Retribusi</th>
+          <th>Kode Billing</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+            
+            <tbody>
+              <%for(let i = 0 ;i<data.length ; i++){%>
+            <tr>
+              <td><%= i +1%></td>
+              <td><%= data[i].inserted%></td>
+              <td><%= data[i].pin%></td>
+              <td><%= data[i].nama_ahli_waris%></td>
+              <td><%= data[i].nama_jenazah%></td>
+              <td><%= data[i].tanggal_meninggal%></td>
+              <td><%= data[i].tanggal_dimakamkan%></td>
+              <td><%= data[i].kecamatan_tpu%></td>
+              <td><%= data[i].nama_tpu%></td>
+              <td><%= data[i].blok%></td>
+              <td><%= data[i].sub_blok%></td>
+              <!-- <td><%= data[i].no_liang%></td> -->
+              <td><%= data[i].retribusi%></td>
+              <td><%= data[i].kode_billing%></td>
+              <!-- <td>Belum Dibayar/Sudah Dibayar</td> -->
+              <td><%= data[i].status_pembayaran%></td>
+              <td><%if(data[i].status_permohonan==null){%>Revisi<%}else{%><%= data[i].status_permohonan%><%}%></td>
+              <td>
+                <center>
+                <ul class="list-inline" style="text-align: center;">
+                  <li><a class="btn btn-warning btn-embossed btn-sm" href="/manajemen_permohonan/pemakaman/verifikasi/<%= data[i].juuid%>" role="button" ><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a></li>
+                </ul>
+                </center>
+              </td>
+            </tr>
+            <%}%>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>  
+  </div>
+  <% include ../../template-backoffice/copyright.ejs %>
+</div>
+<!-- END PAGE CONTENT -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Pendaftaran Permohonan Ijin  </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+              <!-- <a class="btn btn-primary btn-embossed" href="/manajemen_permohonan/pemakaman/bergota_insert" role="button"><i class="fa fa-plus" aria-hidden="true"></i>Bergota</a> -->
+              <!-- <a class="btn btn-primary btn-embossed" href="/manajemen_permohonan/pemakaman/insert" role="button"><i class="fa fa-plus" aria-hidden="true"></i>Lain</a> -->
+            </div>
+            </div>
+        </div>
+    </div>
+<% include ../../template-backoffice/footer.ejs %>
+
+<script type="text/javascript">
+  function cari() {
+    let status = $('#verifikasi').val()
+    location.href = `/manajemen_permohonan/pemakaman?status=${status}`
+  }
+  $(document).ready(function() {
+    $('#data').DataTable({
+        "autoWidth": false, // Tambahkan ini agar tidak bentrok dengan rowspan
+        "language": {
+            "sProcessing":   "Sedang memproses...",
+            "sLengthMenu":   "_MENU_",
+            "sZeroRecords":  "Tidak ditemukan data yang sesuai",
+            "sInfo":         "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+            "sInfoEmpty":    "Menampilkan 0 sampai 0 dari 0 entri",
+            "sInfoFiltered": "(disaring dari _MAX_ entri keseluruhan)",
+            "oPaginate": {
+                "sFirst":    "Pertama",
+                "sPrevious": "Sebelumnya",
+                "sNext":     "Selanjutnya",
+                "sLast":     "Terakhir"
+            }
+        },
+        "columnDefs": [
+            { "width": "100px", "targets": 1 },
+            { "orderable": false, "targets": 15 } // Kolom 'Option' (index 15) jangan bisa di-sort
+        ]
+    });
+  });
+</script>

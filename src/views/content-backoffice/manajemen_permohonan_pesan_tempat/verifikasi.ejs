@@ -1,0 +1,149 @@
+<% include ../../template-backoffice/header.ejs %>
+
+<!-- BEGIN PAGE CONTENT -->
+<div class="page-content">
+  <div class="header">
+    <h2><strong>Verifikasi Permohonan Pesan Tempat Makam</strong></h2>
+    <div class="breadcrumb-wrapper">
+      <ol class="breadcrumb">
+        <li><a href="/backoffice">Dashboard</a></li>
+        <li><a href="/manajemen_permohonan/pesan_tempat_makam">Data</a></li>
+        <li class="active">Edit Data</li>
+      </ol>
+    </div>
+  </div>
+  
+  <div class="row">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      <div class="panel">
+        <div class="panel-content">
+          <form role="form" action="/manajemen_permohonan/submit_verifikasi_pemohon" method="POST" enctype="multipart/form-data" class="form-horizontal">
+            <div class="form-group">
+              <label for="" class="col-sm-3 control-label">Nama Pemohon</label>
+              <div class="col-sm-9">
+                <input type="text" class="form-control" name="nama" id="" placeholder="" value="<%= data[0].nama%>">
+              </div>
+            </div>
+    
+            <div class="form-group">
+              <label for="" class="col-sm-3 control-label">No. KTP</label>
+              <div class="col-sm-9">
+                <input type="text" class="form-control" name="ktp" id="" placeholder="" value="<%= data[0].ktp%>">
+              </div>
+            </div>
+    
+            <div class="form-group">
+              <label for="" class="col-sm-3 control-label">Upload KTP Pemohon</label>
+              <div class="col-sm-9">
+                <input type="file" class="form-control" name="foto_ktp" id="" placeholder=""  accept="image/*,.pdf">
+                <%if(data[0].foto_ktp){%>
+                  <a href="/foto/<%= data[0].foto_ktp%>" target="_blank"><span class="label label-info">Lihat File</span></a>
+                <%}%>
+              </div>
+            </div>
+    
+            <div class="form-group">
+              <label for="" class="col-sm-3 control-label">No. HP</label>
+              <div class="col-sm-9">
+                <input type="text" class="form-control" name="hp" id="" placeholder="" value="<%= data[0].hp%>">
+              </div>
+            </div>
+    
+            <div class="form-group">
+              <label for="" class="col-sm-3 control-label">Email</label>
+              <div class="col-sm-9">
+                <input type="text" class="form-control" name="email" id="" placeholder="" value="<%= data[0].email%>">
+              </div>
+            </div>
+    
+            <div class="form-group">
+              <label for="" class="col-sm-3 control-label">Alamat Lengkap (RT, RW, Kelurahan, Kecamatan, Kabupaten/Kota)</label>
+              <div class="col-sm-9">
+                <textarea name="alamat" id="" class="form-control" rows="5"><%- data[0].alamat_pemohon%></textarea>
+              </div>
+            </div>
+    
+            <div class="form-group">
+              <label for="" class="col-sm-3 control-label">Lokasi Pemakaman</label>
+              <div class="col-sm-9">
+                <input type="text" class="form-control" name="nama_tpu" id="" placeholder="" value="<%= data[0].nama_tpu%>">
+              </div>
+            </div>
+    
+            <div class="form-group">
+              <label for="" class="col-sm-3 control-label">Blok</label>
+              <div class="col-sm-9">
+                <input type="text" class="form-control" name="blok" id="" placeholder="" value="<%= data[0].blok%>">
+              </div>
+            </div>
+    
+            <div class="form-group">
+              <label for="" class="col-sm-3 control-label">Subblok</label>
+              <div class="col-sm-9">
+                <input type="text" class="form-control" name="sub_blok" id="" placeholder="" value="<%= data[0].sub_blok%>">
+              </div>
+            </div>
+    
+            <div class="form-group">
+              <label for="" class="col-sm-3 control-label">No. Liang</label>
+              <div class="col-sm-9">
+                <input type="text" class="form-control" name="no_liang" id="" placeholder="" value="<%= data[0].no_liang%>">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="col-sm-12">
+                <hr>
+              </div>
+            </div>
+            <input type="text" name="id" value="<%= data[0].pemohon_id%>" hidden>
+            <input type="text" name="makam_id" value="<%= data[0].makam_id%>" hidden>
+            <input type="text" name="dokument_id" value="<%= data[0].dokument_id%>" hidden>
+            <input type="text" name="perpanjangan_id" value="<%= data[0].perpanjangan_id%>" hidden>
+            <input type="text" name="jenazah_id" value="<%= data[0].jenazah_id%>" hidden>
+
+
+            <div class="form-group">
+              <label for="" class="col-sm-3 control-label">Verifikasi Permohonan</label>
+              <div class="col-sm-9">
+                <select name="verifikasi" id="" class="form-control">
+                  <option value="">-- Pilih --</option>
+                  <option value="0">Belum Diverifikasi</option>
+                  <option value="2">Disetujui</option>
+                  <option value="3">Dibatalkan</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="" class="col-sm-3 control-label">Perpanjangan ke berapa</label>
+              <div class="col-sm-9">
+                <input type="number"  name="perpanjangan_ke" id="perpanjangan_ke" class="form-control">
+              
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="col-sm-9 col-md-offset-3">
+                <button class="btn btn-primary btn-embossed">Simpan</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="copyright">
+      <p class="pull-left sm-pull-reset">
+        <span>Copyright <span class="copyright">©</span> 2022 </span>
+        <span>Dinas Perumahan dan Kawasan Permukiman Kota Semarang</span>.
+      </p>
+    </div>
+  </div>
+</div>
+<!-- END PAGE CONTENT -->
+
+<% include ../../template-backoffice/footer.ejs %>
+<script type="text/javascript">
+      
+</script>

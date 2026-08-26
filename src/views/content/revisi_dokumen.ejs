@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Sistem Informasi Manajemen Makam Kota Semarang, Makam Kota Semarang, Kota Semarang, Pemerintah Kota Semarang">
+    <meta name="author" content="Pemerintah Kota Semarang, Dinas Perumahan dan Kawasan Permukiman Kota Semarang">
+    <link rel="shortcut icon" href="/images/template/shortcut_icon.ico">
+    <title>Sistem Informasi Manajemen Makam Kota Semarang</title>
+
+    <link href="/stylesheets/template/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/stylesheets/template/css/style.css" rel="stylesheet">
+    <link href="/stylesheets/template/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    <!-- Plugin This Page --> 
+    
+    <script src="/javascripts/template/jquery.min.js"></script>
+
+    <!-- End Plugins This Page -->
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <style type="text/css">
+
+    </style>
+</head>
+
+<body>
+    <header class="pt-2 pb-2 shadow" style="background-color:whitesmoke; ">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 col-xl-12">
+                    <div style="width: 100%;display:flex">
+                        <img src="/images/template/logo kota semarang.png" alt="" style="height: 70px;">
+                        <div style="display: flex;justify-content:center;align-items:flex-start;height:70px;background-color: ;flex-direction: column;margin-left: 10px;">
+                            <h5 class="m-0"><strong>PEMERINTAH KOTA SEMARANG</strong></h5>
+                            <h6 class="m-0">DINAS PERUMAHAN DAN KAWASAN PERMUKIMAN</h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-xl-8 offset-lg-2 offset-xl-2 shadow-lg">
+                    <div style="width: 100%;padding:25px;background-color: #fff;border-radius: 10px;">
+                        <h3><strong>Persyaratan</strong></h3>
+                        <hr>
+                        <div class="alert alert-danger" role="alert">
+                            <%= data[0].catatan_revisi%>
+                        </div>
+                        <form action="/revisi_dokumen/revisi" method="post" enctype="multipart/form-data">
+                            <div class="form-group">
+                              <label for="">Upload KTP Ahli Waris <sup style="color: red;"><small><strong>* Wajib diisi</strong></small></sup></label>
+                              <input type="file" class="form-control" name="foto_ktp_pemohon" id=""  accept="image/*,.pdf" >
+                                <%if(data[0].foto_ktp_pemohon){%>
+                                    <a href="/foto/<%= data[0].foto_ktp_pemohon%>" class="btn btn-dark btn-sm" target="_blank" style="margin-top:5px"><span class="label label-info">Lihat File</span></a>
+                                <%}%>
+                            </div>
+<input type="text" name="permohonan_id" value="<%= data[0].permohonan_id%>" hidden>
+<input type="text" name="jenazah_id" value="<%= data[0].jenazah_id%>" hidden>
+<input type="text" name="dokument_id" value="<%= data[0].dokument_id%>" hidden>
+<input type="text" name="perpanjangan_id" value="<%= data[0].perpanjangan_id%>" hidden>
+
+                            <div class="form-group">
+                                <label for="">Upload KTP Jenazah</label>
+                                <input type="file" class="form-control" name="foto_ktp_jenazah" id="" accept="image/*,.pdf" >
+                                  <%if(data[0].foto_ktp_jenazah){%>
+                                      <a href="/foto/<%= data[0].foto_ktp_jenazah%>" class="btn btn-dark btn-sm" target="_blank" style="margin-top:5px"><span class="label label-info">Lihat File</span></a>
+                                  <%}%>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="">Surat Kematian Rumah Sakit/RW/RT <sup style="color: red;"><small><strong>* Wajib diisi</strong></small></sup></label>
+                                <input type="file" class="form-control" name="surat_kematian" id=""  accept="image/*,.pdf" >
+                                <%if(data[0].surat_kematian){%>
+                                    <a href="/foto/<%= data[0].surat_kematian%>" class="btn btn-dark btn-sm" target="_blank" style="margin-top:5px"><span class="label label-info">Lihat File</span></a>
+                                <%}%>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="">Surat Dari Lurah / Catatan Sipil</label>
+                                <input type="file" class="form-control" name="surat_lurah" id=""  accept="image/*,.pdf" >
+                                <%if(data[0].surat_lurah){%>
+                                    <a href="/foto/<%= data[0].surat_lurah%>" class="btn btn-dark btn-sm" target="_blank" style="margin-top:5px"><span class="label label-info">Lihat File</span></a>
+                                <%}%>
+                            </div>
+                            
+                            
+                            <button type="submit" class="btn btn-primary">Simpan</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </section>
+
+    
+    
+    <script src="/javascripts/template/bootstrap.bundle.min.js"></script>
+    <!-- Plugins This Page -->
+    <!-- End Plugins This Page -->
+    <script type="text/javascript">
+        
+    </script>
+</body>
+</html>

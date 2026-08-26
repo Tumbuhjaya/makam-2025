@@ -1,0 +1,42 @@
+variables:
+  WORK_DIR: "/home/cicd/Apps/makam"
+  USER_VPS: "cicd"
+  MAIN_BRANCH: "main"
+  TEST_BRANCH: "nata"
+
+stages:
+  - build-push-image
+  - update
+  - testing
+
+build-image:
+  image: docker:stable
+  stage: build-push-image
+  rules:
+    - if: $CI_COMMIT_BRANCH == $MAIN_BRANCH
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build -t $CI_REGISTRY_IMAGE .
+    - docker push $CI_REGISTRY_IMAGE
+
+update-container:
+  image: natadesss/alpine-ssh
+  stage: update
+  rules:
+    - if: $CI_COMMIT_BRANCH == $MAIN_BRANCH
+  before_script:
+    - eval $(ssh-agent -s)
+    - ssh-add <(echo "$SSH_KEYS" | base64 -d) > /dev/null
+  script:
+    - ssh "$USER_VPS"@"$SSH_IP" -oStrictHostKeyChecking=no "cd "$WORK_DIR" && docker-compose pull && docker-compose up -d"
+
+test-connection:
+  image: natadesss/alpine-ssh
+  stage: testing
+  rules:
+    - if: $CI_COMMIT_BRANCH == $TEST_BRANCH
+  before_script:
+    - eval $(ssh-agent -s)
+    - ssh-add <(echo "$SSH_KEYS" | base64 -d) > /dev/null
+  script:
+    - ssh "$USER_VPS"@"$SSH_IP" -oStrictHostKeyChecking=no "cd "$WORK_DIR" && ls"

@@ -1,0 +1,276 @@
+<% include ../../template-backoffice/header.ejs %>
+
+<!-- BEGIN PAGE CONTENT -->
+<div class="page-content">
+  <div class="header">
+    <h2><strong>Data Jenazah</strong></h2>
+    <div class="breadcrumb-wrapper">
+      <ol class="breadcrumb">
+        <li><a href="/backoffice">Dashboard</a>
+        </li>
+        <li class="active">Data</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      <div class="panel">
+        <div class="panel-header header-line">
+           <!-- <a class="btn btn-primary btn-embossed" href="/manajemen_basic/insert" role="button"><i class="fa fa-plus" aria-hidden="true"></i>Tambah Data</a> -->
+        </div>
+        <div class="panel-content">
+          <div class="row">
+            <div class="col-md-2 col-lg-2">
+              <select name="" id="jumlah_data_per_page" class="form-control" style="width: 60%;">
+                <option value="10">10</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+            </div>
+            <div class="col-md-10 col-lg-10">
+              <div style="width: 100%;display: flex;justify-content: flex-end;">
+                <div class="form-inline">
+                  <div class="form-group">
+                    <label class="sr-only" for="">Email address</label>
+                    <input type="text" class="form-control" id="cari" placeholder="Pencarian .....">
+                  </div>
+                  <button class="btn btn-info" style="margin-bottom: 0;padding-left: 10px;padding-right: 10px;margin-left: 5px;margin-right: 5px;" onclick="cari()">Cari</button>
+                  <button class="btn btn-danger" style="margin-bottom: 0;padding-left: 10px;padding-right: 10px;" onclick="reset()">Reset</button>
+                </div>
+              </div>
+              
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12 col-lg-12">
+              <div style="width: 100%;">
+                <table class="table table-bordered table-striped table-hover" style="margin-bottom: 0;">
+                  <thead>
+                    <tr>
+                      <th class="header" rowspan="2">No.</th>
+                      <th class="header" rowspan="2">Tanggal Permohonan</th>
+                      <th class="header" rowspan="2" style="min-width: 100px;">Kode Registrasi</th>
+                      <th class="header" rowspan="2" style="min-width: 150px;">Nama Pemohon/Ahli Waris</th>
+                      <th class="header" rowspan="2" style="min-width: 150px;">Nama Jenazah</th>
+                      <th class="header" rowspan="2" style="text-align: center;">Tanggal Meninggal</th>
+                      <th class="header" rowspan="2" style="text-align: center;">Tanggal Dimakamkan</th>
+                      <th class="header" colspan="5" style="text-align: center;">Lokasi Pemakaman</th>
+                      <th class="header" colspan="2" style="text-align: center;">Retribusi & Pembayaran</th>
+                      <th class="header" rowspan="2" style="min-width: 100px;">Masa Berlaku Perijinan Sampai Dengan</th>
+                      <th class="header" rowspan="2" style="min-width: 610px;">Option</th>
+                    </tr>
+      
+                    <tr>
+                      <th class="header" style="min-width: 100px;">Kecamatan</th>
+                      <th class="header" style="min-width: 50px;">Lokasi</th>
+                      <th class="header" style="min-width: 50px;">Blok</th>
+                      <th class="header" style="min-width: 50px;">Sub Blok</th>
+                      <th class="header" style="min-width: 50px;">No. Liang</th>
+                      <th class="header" style="min-width: 100px;">Kode Billing</th>
+                      <th class="header" style="min-width: 100px;">Status</th>
+                    </tr>
+                  </thead>
+                  
+                  <tbody id="list_data">
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 col-lg-6" style="background-color: ;">
+              <div id="entry"></div>
+            </div>
+
+            <div class="col-md-6 col-lg-6 pagination2" style="background-color: ;">
+              <nav aria-label="Page navigation example">
+                <ul class="pagination">
+                </ul>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>  
+  </div>
+  <% include ../../template-backoffice/copyright.ejs %>
+</div>
+<!-- END PAGE CONTENT -->
+
+<% include ../../template-backoffice/footer.ejs %>
+
+
+<script type="text/javascript">
+  let jumlah_data_per_page = 10
+  let hal = 1
+  let maxHal = 0
+  $('#jumlah_data_per_page').change(function () {
+    jumlah_data_per_page = $('#jumlah_data_per_page').val()
+    ubah_page(hal)
+  })
+  async function ubah_page(halaman) {
+    if (halaman>0) {
+    if (halaman) {
+        hal = halaman
+      }
+
+      let data = {
+        cari : $('#cari').val(),
+        count:1
+      }
+ let hsl = await $.post('/manajemen_perijinan/list_pemakaman',data)
+    maxHal = Math.ceil( hsl.data[0].jml/jumlah_data_per_page)
+    // let previous_disable = ''
+
+    // if (hal - 1 <= 0) {
+    //       previous_disable = 'disabled'
+    //     }
+    $('.pagination').empty()
+    for (let i = 0; i < 3; i++) {
+            let previous_disable = ''
+        if (hal - 1 <= 0) {
+          previous_disable = 'disabled'
+        }
+        let li = `<li class="${hal - 1 <= 0?'disabled':''}" onclick="ubah_page(${hal - 1})">
+          <a href="#" >
+            Sebelumnya
+          </a>
+        </li>`
+        if (hal>1) {
+          li += `<li onclick="ubah_page(${1})">
+          <a href="#" >
+            1
+          </a>
+        </li>`
+        }
+        for (let i = 0; i < 3; i++) {
+          if (hal + i <= maxHal) {
+
+            let current = ''
+            // let aktif = ''
+            // if (i == 0) {
+            //   aktif = 'active'
+            // }
+            li += `
+        <li class="${i == 0?'active':''}" onclick="ubah_page(${hal + i})">
+          <a href="#">${hal + i} <span class="sr-only">(current)</span></a>
+        </li>`
+          }
+
+        }
+        // let next_disable = ''
+        // if (hal + 1 >= maxHal) {
+        //   next_disable = 'disabled'
+        // }
+        $('.pagination').empty()
+        $('.pagination').append(`
+        <nav aria-label="...">
+          <ul class="pagination">
+            ${li}
+            <li >...</li>
+            <li >
+              <a href="#" onclick="ubah_page(${maxHal})">
+                ${maxHal}
+              </a></li>
+            <li class="${hal + 1 >= maxHal?'disabled':''}">
+              <a href="#" onclick="ubah_page(${hal + 1})">
+                Selanjutnya
+              </a></li>
+          </ul>
+        </nav>`)}
+
+      let data2 = {
+        cari : $('#cari').val(),
+        limit: jumlah_data_per_page,
+        offset: (hal - 1) * jumlah_data_per_page,
+  }
+  $('#list_data').empty()
+   await $.post('/manajemen_perijinan/list_pemakaman',data2).then(function (hsl2) {
+    $('#entry').html(`Menampilkan ${((hal - 1) * jumlah_data_per_page) +1} sampai ${((hal - 1) * jumlah_data_per_page) + hsl2.data.length} dari ${(hsl.data[0].jml).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')} entri`);
+  for (let i = 0; i < hsl2.data.length; i++) {
+    let color = ''
+    if (hsl2.data[i].tanggal_berlaku_surat) {
+      if (hsl2.data[i].kadaluarsa) {
+        color = `danger`
+      } else {
+        color = `success`
+      }
+    }
+   let b = hsl2.data[i].cek=='true' && hsl2.user.is_admin==1?`<li><a class="btn btn-success btn-embossed btn-sm" target="_blank" href="/manajemen_master/data_jenazah/edit/${ hsl2.data[i].jenazah_id}" role="button" >Edit Jenazah</a></li>`:''
+  
+      $('#list_data').append(`<tr>
+                <td>${((hal - 1) * jumlah_data_per_page)+ i +1}</td>
+                <td>${ hsl2.data[i].inserted}</td>
+                <td>${ hsl2.data[i].pin}</td>
+                <td>${ hsl2.data[i].nama_ahli_waris}</td>
+                <td>${ hsl2.data[i].nama_jenazah}</td>
+                <td>${ hsl2.data[i].tanggal_meninggal}</td>
+                <td>${ hsl2.data[i].tanggal_dimakamkan}</td>
+                <td>${ hsl2.data[i].kecamatan}</td>
+                <td>${ hsl2.data[i].nama_tpu}</td>
+                <td>${ hsl2.data[i].blok}</td>
+                <td>${ hsl2.data[i].sub_blok}</td>
+                <td>${ hsl2.data[i].no_liang}</td>
+                <td>${ hsl2.data[i].kode_billing}</td>
+                <td>${ hsl2.data[i].status_pembayaran}</td>
+                <td>
+                  <span class="label label-${color}">${ hsl2.data[i].tanggal_berlaku_surat}</span>
+                </td>
+                <td>
+                  <center>
+                    <ul class="list-inline" style="text-align: center;">
+                      ${b}
+                    </ul>
+                    </center>
+                </td>
+              </tr>`)      
+    }
+  
+  })
+       }
+}
+
+ubah_page(1)
+function cari() {
+  hal = 1
+  ubah_page(1)
+}
+function reset() {
+  $('#cari').val('')
+  ubah_page(1)
+
+}
+  $(document).ready(function() {
+    // $(`.upload_sk`).click(function () {
+    //   let x = $('.upload_sk').data('dokument')
+    //   console.log(x);
+    //   $('#dokument_id').val(x)
+    // })
+   
+    // $('#data').DataTable({
+    //   "language": {
+    //       "sProcessing":   "Sedang memproses...",
+    //       "sLengthMenu":   "_MENU_",
+    //       "sZeroRecords":  "Tidak ditemukan data yang sesuai",
+    //       "sInfo":         "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+    //       "sInfoEmpty":    "Menampilkan 0 sampai 0 dari 0 entri",
+    //       "sInfoFiltered": "(disaring dari _MAX_ entri keseluruhan)",
+    //       "sInfoPostFix":  "",
+    //       "sUrl":          "",
+    //       "oPaginate": {
+    //         "sFirst":    "Pertama",
+    //         "sPrevious": "Sebelumnya",
+    //         "sNext":     "Selanjutnya",
+    //         "sLast":     "Terakhir"
+    //       }
+    //   },
+    //   "columnDefs": [
+    //       { "width": "100px", "targets": 1}
+    //   ],
+    // });
+  });
+</script>

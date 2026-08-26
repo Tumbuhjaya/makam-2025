@@ -1,0 +1,613 @@
+<% include ../../template-backoffice/header.ejs %>
+
+<!-- BEGIN PAGE CONTENT -->
+<div class="page-content">
+  <div class="header">
+    <h2><strong>Input Permohonan Ijin Pemakaman Tumpang Jenazah</strong></h2>
+    <div class="breadcrumb-wrapper">
+      <ol class="breadcrumb">
+        <li><a href="/backoffice">Dashboard</a></li>
+        <li><a href="/manajemen_pemakaman_special/pemakaman_tumpang">Data</a></li>
+        <li class="active">Edit Data</li>
+      </ol>
+    </div>
+  </div>
+  
+  <div class="row">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      <form role="form" action="/manajemen_permohonan/submit_insert" method="POST" enctype="multipart/form-data" class="form-horizontal">
+        <div class="tab tab-light clearfix"> 
+          <!-- Nav tabs -->
+          <ul class="nav nav-tabs" role="tablist">
+              <li class="active"><a href="#tab2-1" data-toggle="tab" aria-expanded="false" style="padding: 10px 15px;"><span class="font-custom" style="font-size: 14px;">PEMOHON</span></a></li>
+              <li><a href="#tab2-2" data-toggle="tab" aria-expanded="false" style="padding: 10px 15px;"><span class="font-custom" style="font-size: 14px;">JENAZAH</span></a></li>
+              <li><a href="#tab2-3" data-toggle="tab" aria-expanded="false" style="padding: 10px 15px;"><span class="font-custom" style="font-size: 14px;">LOKASI MAKAM</span></a></li>
+              <li><a href="#tab2-4" data-toggle="tab" aria-expanded="false" style="padding: 10px 15px;"><span class="font-custom" style="font-size: 14px;">SYARAT & KETERANGAN</span></a></li>
+              <li><a href="#tab2-5" data-toggle="tab" aria-expanded="false" style="padding: 10px 15px;"><span class="font-custom" style="font-size: 14px;">VERIFIKASI & SIMPAN DATA</span></a></li>
+              
+          </ul>
+          <!-- Tab panes -->
+          <div class="tab-content">
+            <div role="tabpanel" class="tab-pane fade active in" id="tab2-1">
+              <div class="form-group">
+                <label for="" class="col-sm-3 control-label">Nama Ahli Waris</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" id="" placeholder="" name="nama_ahli_waris">
+                </div>
+              </div>
+                   <input type="text" name="jns_pemakaman" value="4" hidden>
+
+              
+              <div class="form-group">
+                <label for="" class="col-sm-3 control-label">NIK</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" id="" placeholder="" name="nik">
+                </div>
+              </div>
+              
+              <div class="form-group">
+                <label for="" class="col-sm-3 control-label">Pekerjaan</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" id="" placeholder="" name="pekerjaan">
+                </div>
+              </div>
+
+
+              <div class="form-group">
+                <label for="" class="col-sm-3 control-label">Domisili Pemohon</label>
+                <div class="col-sm-9">
+                  <select name="domisili_pemohon" id="domisili_pemohon" class="form-control">
+                    <option value="">-- Pilih --</option>
+                      <option value="0">Dalam Kota Semarang</option>
+                      <option value="1">Luar Kota Semarang</option>
+                  </select>
+                </div>
+              </div>
+      
+              <!-- apabila domisili luar kota tampilkan ini -->
+              <div class="form-group ">
+                <label for="" class="col-sm-3 control-label">Alamat Lengkap</label>
+                <div class="col-sm-9">
+                  <textarea name="alamat_pemohon" id="" class="form-control" rows="2"></textarea>
+                </div>
+              </div>
+
+              <!-- apabila domisili dalam kota tampilkan ini -->
+              <div class="form-group konten-dalam-pemohon">
+                <label for="" class="col-sm-3 control-label">Kecamatan</label>
+                <div class="col-sm-9">
+                  <select name="kecamatan_pemohon" id="kecamatan_pemohon" class="form-control" data-search="true" style="width: 100%;">
+                    <option value="">-- Pilih --</option>
+                    <%for(let i = 0 ;i<kec.length ; i++){%>
+                        <option value="<%= kec[i].id_kecamatan%>"><%= kec[i].kecamatan%></option>
+                    <%}%>
+                  </select>
+                </div>
+              </div>
+
+              <!-- apabila domisili dalam kota tampilkan ini -->
+              <div class="form-group konten-dalam-pemohon">
+                <label for="" class="col-sm-3 control-label">Kelurahan</label>
+                <div class="col-sm-9">
+                  <select name="kelurahan_pemohon" id="kelurahan_pemohon" class="form-control" data-search="true" style="width: 100%;">
+                    <option value="">-- Pilih --</option>
+                  </select>
+                </div>
+              </div>
+
+              
+
+              <div class="form-group">
+                <label for="" class="col-sm-3 control-label">No. Telepon / Hp</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" id="" placeholder="" name="hp">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="" class="col-sm-3 control-label">Email</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" id="" placeholder="" name="email">
+                </div>
+              </div>
+            </div>
+           
+            <div role="tabpanel" class="tab-pane fade" id="tab2-2">
+              <div class="form-group">
+                <label for="" class="col-sm-3 control-label">Nama Jenazah</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" id="" placeholder="" name="nama_jenazah">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="" class="col-sm-3 control-label">Jenis Kelamin</label>
+                <div class="col-sm-9">
+                  <select name="jenis_kelamin" id="jenis_kelamin"  value="" class="form-control">
+                    <option value="">-- Pilih --</option>
+                    <option value="Laki-laki">Laki-laki</option>
+                    <option value="Perempuan">Perempuan</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="" class="col-sm-3 control-label">Agama</label>
+                <div class="col-sm-9">
+                  <select name="agama" id="agama"   class="form-control">
+                    <option value="">-- Pilih --</option>
+                    <option value="Islam">Islam</option>
+                    <option value="Kristen">Kristen</option>
+                    <option value="Katolik">Katolik</option>
+                    <option value="Hindu">Hindu</option>
+                    <option value="Budha">Budha</option>
+                    <option value="Konghucu">Konghucu</option>
+                    <option value="Lainnya">Lainnya</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group row">
+                <label for="" class="col-sm-3 control-label">NIK </label>
+                <div class="col-sm-9">
+                  <input type="number" class="form-control" name="nik_jenazah" id="nik_jenazah" maxlength="16">
+                </div>
+              </div>
+              
+              <div class="form-group">
+                <label for="" class="col-sm-3 control-label">Domisili Jenazah</label>
+                <div class="col-sm-9">
+                  <select name="domisili_jenazah" id="domisili_jenazah" class="form-control">
+                    <option value="">-- Pilih --</option>
+                      <option value="0">Dalam Kota Semarang</option>
+                      <option value="1">Luar Kota Semarang</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- apabila domisili luar kota tampilkan ini -->
+              <div class="form-group ">
+                <label for="" class="col-sm-3 control-label">Alamat Lengkap</label>
+                <div class="col-sm-9">
+                  <textarea name="alamat_jenazah" id="" class="form-control" rows="2"></textarea>
+                </div>
+              </div>
+
+              <!-- apabila domisili dalam kota tampilkan ini -->
+              <div class="form-group konten-dalam-jenazah">
+                <label for="" class="col-sm-3 control-label">Kecamatan</label>
+                <div class="col-sm-9">
+                  <select name="kecamatan_jenazah" id="kecamatan_jenazah" class="form-control" data-search="true" style="width: 100%;">
+                    <option value="">-- Pilih --</option>
+                    <%for(let i = 0 ;i<kec.length ; i++){%>
+                        <option value="<%= kec[i].id_kecamatan%>"><%= kec[i].kecamatan%></option>
+                    <%}%>
+                  </select>
+                </div>
+              </div>
+
+              <!-- apabila domisili dalam kota tampilkan ini -->
+              <div class="form-group konten-dalam-jenazah">
+                <label for="" class="col-sm-3 control-label">Kelurahan</label>
+                <div class="col-sm-9">
+                  <select name="kelurahan_jenazah" id="kelurahan_jenazah" class="form-control" data-search="true" style="width: 100%;">
+                    <option value="">-- Pilih --</option>
+                  </select>
+                </div>
+              </div>
+
+              
+
+              <div class="form-group">
+                <label for="" class="col-sm-3 control-label">Meninggal Pada Tanggal</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" id="tgl1" placeholder="" name="tanggal_meninggal">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="" class="col-sm-3 control-label">Dimakamkan Pada Tanggal</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" id="tgl2" placeholder="" name="tanggal_dimakamkan" >
+                </div>
+              </div>
+
+              <div class="form-group row">
+                <label for="" class="col-sm-3  control-label">Jam Dimakamkan </label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" name="jam_dimakamkan" id="jam_dimakamkan">
+                </div>
+              </div>
+      
+          </div>
+            <div role="tabpanel" class="tab-pane fade" id="tab2-3">
+              <div class="form-group">
+                <label for="" class="col-sm-3 control-label">Kecamatan</label>
+                <div class="col-sm-9">
+                  <select name="kecamatan_makam" id="kecamatan_makam" class="form-control" data-search="true" style="width: 100%;">
+                    <option value="">-- Pilih --</option>
+                      <%for(let i = 0 ;i<kec.length ; i++){%>
+                        <option value="<%= kec[i].id_kecamatan%>"><%= kec[i].kecamatan%></option>
+                    <%}%>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="" class="col-sm-3 control-label">Lokasi Pemakaman</label>
+                <div class="col-sm-9">
+                  <select name="lokasi_makam" id="lokasi_makam" class="form-control" data-search="true" style="width: 100%;">
+                    <option value="">-- Pilih --</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="" class="col-sm-3 control-label">Cluster</label>
+                <div class="col-sm-9">
+                  <select name="agama_makam" id="agama_makam" class="form-control">
+                    <option value="">-- Pilih --</option>
+                    <option value="1">Islam</option>
+                    <option value="0">Non Islam</option>
+
+                  </select>
+                </div>
+              </div>
+
+
+              <div class="form-group">
+                <label for="" class="col-sm-3 control-label">Blok</label>
+                <div class="col-sm-9">
+                  <select name="blok_makam" id="blok_makam" class="form-control" data-search="true" style="width: 100%;">
+                    <option value="">-- Pilih --</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="" class="col-sm-3 control-label">Sub Blok</label>
+                <div class="col-sm-9">
+                  <select name="subblok_makam" id="subblok_makam" class="form-control" data-search="true" style="width: 100%;">
+                    <option value="">-- Pilih --</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="" class="col-sm-3 control-label">No. Liang</label>
+                <div class="col-sm-9">
+                  <select name="nomor_liang_makam" id="nomor_liang_makam" class="form-control" data-search="true" style="width: 100%;">
+                    <option value="">-- Pilih --</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div role="tabpanel" class="tab-pane fade" id="tab2-4">
+              <div class="row">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                  <div class="form-group">
+                    <label>Upload KTP Ahli Waris</label>
+                    <div class="row">
+                      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+                        <input type="file"  accept="image/*,.pdf" class="form-control" name="foto_ktp_pemohon" id="">
+                      </div>
+                    </div>
+                  </div>
+
+
+                  <div class="form-group">
+                    <label>Upload KTP Jenazah</label>
+                    <div class="row">
+                      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+                        <input type="file"  accept="image/*,.pdf" class="form-control" name="foto_ktp_jenazah" id="">
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label>Surat Kematian Rumah Sakit/RW/RT</label>
+                    <div class="row">
+                      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+                        <input type="file"  accept="image/*,.pdf" class="form-control" name="surat_kematian" id="">
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label>Surat Dari Lurah / Catatan Sipil</label>
+                    <div class="row">
+                      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+                        <input type="file"  accept="image/*,.pdf" class="form-control" name="surat_lurah" id="">
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="form-group">
+                    <label>Keterangan</label>
+                    <div class="row">
+                      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+                        <textarea name="keterangan" id="" rows="5" class="form-control"></textarea>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div role="tabpanel" class="tab-pane fade" id="tab2-5">
+              <div class="form-group">
+                <label for="" class="col-sm-3 control-label">Verifikasi Permohonan</label>
+                <div class="col-sm-9">
+                  <select name="verifikasi" id="verifikasi" class="form-control">
+                    <option value="">-- Pilih --</option>
+                      <option value="0">Belum Diverifikasi</option>
+                      <option value="1">Revisi</option>
+                      <option value="2">Disetujui</option>
+                      <option value="3">Dibatalkan</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group konten-revisi">
+                <label for="" class="col-sm-3 control-label">Catatan Revisi</label>
+                <div class="col-sm-9">
+                  <textarea name="catatan_revisi" id="" class="form-control" rows="5"></textarea>
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="col-sm-9 col-md-offset-3">
+                  <button class="btn btn-primary btn-embossed">Simpan</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <% include ../../template-backoffice/copyright.ejs %>
+</div>
+<!-- END PAGE CONTENT -->
+
+<% include ../../template-backoffice/footer.ejs %>
+<script type="text/javascript">
+      $('.konten-dalam-pemohon').hide(); 
+      $('.konten-luar-pemohon').hide(); 
+      let domisili_pemohon = $(`#domisili_pemohon`).val()
+      $('.konten-dalam-pemohon').hide(); 
+      $('.konten-luar-pemohon').hide(); 
+            if (domisili_pemohon == '') { 
+                $('.konten-dalam-pemohon').hide(); 
+                $('.konten-luar-pemohon').hide(); 
+            } 
+    
+            if (domisili_pemohon == '0') { 
+                $('.konten-dalam-pemohon').show(); 
+                $('.konten-luar-pemohon').hide(); 
+            }  
+    
+            if (domisili_pemohon == '1') { 
+                $('.konten-dalam-pemohon').hide(); 
+                $('.konten-luar-pemohon').show();    
+            } 
+            let kecPemohon = $(`#kecamatan_pemohon`).val()
+            let kelPemohon = $(`#kelurahan_pemohon`).val()
+            let kecJenazah = $(`#kecamatan_jenazah`).val()
+            let kelJenazah = $(`#kelurahan_jenazah`).val()
+            console.log(kecPemohon,kelPemohon,kecJenazah,kelJenazah);
+
+            $.get(`/permohonan_ijin/kelurahanByKec/${kecPemohon}`,function (data) {
+                $(`#kelurahan_pemohon`).empty()
+                $(`#kelurahan_pemohon`).append(`<option value="">-- Pilih --</option>`)
+                for (let i = 0; i < data.length; i++) {
+                    $(`#kelurahan_pemohon`).append(`<option value="${data[i].id_kelurahan}">${data[i].desa}</option>`)
+                }
+            })
+            $.get(`/permohonan_ijin/kelurahanByKec/${kecJenazah}`,function (data) {
+                $(`#kelurahan_jenazah`).empty()
+                $(`#kelurahan_jenazah`).append(`<option value="">-- Pilih --</option>`)
+                for (let i = 0; i < data.length; i++) {
+                    $(`#kelurahan_jenazah`).append(`<option value="${data[i].id_kelurahan}">${data[i].desa}</option>`)
+                }
+            })
+      $('#kecamatan_pemohon').change(function () {
+        let kecPemohon = $(this).val()
+
+        $.get(`/permohonan_ijin/kelurahanByKec/${kecPemohon}`,function (data) {
+                $(`#kelurahan_pemohon`).empty()
+                $(`#kelurahan_pemohon`).append(`<option value="" selected>-- Pilih --</option>`)
+                for (let i = 0; i < data.length; i++) {
+                    $(`#kelurahan_pemohon`).append(`<option value="${data[i].id_kelurahan}">${data[i].desa}</option>`)
+                }
+            })
+      })
+      $('#kecamatan_jenazah').change(function () {
+
+      let kecJenazah = $(this).val()
+      $.get(`/permohonan_ijin/kelurahanByKec/${kecJenazah}`,function (data) {
+          $(`#kelurahan_jenazah`).empty()
+          $(`#kelurahan_jenazah`).append(`<option value="" selected>-- Pilih --</option>`)
+          for (let i = 0; i < data.length; i++) {
+              $(`#kelurahan_jenazah`).append(`<option value="${data[i].id_kelurahan}">${data[i].desa}</option>`)
+          }
+        })
+      })
+      $('#domisili_pemohon').change(function(){ 
+        console.log($(this).val());
+            if ($(this).val() == '') { 
+                $('.konten-dalam-pemohon').hide(); 
+                $('.konten-luar-pemohon').hide(); 
+            } 
+    
+            if ($(this).val() == '0') { 
+                $('.konten-dalam-pemohon').show(); 
+                $('.konten-luar-pemohon').hide(); 
+            }  
+    
+            if ($(this).val() == '1') { 
+                $('.konten-dalam-pemohon').hide(); 
+                $('.konten-luar-pemohon').show();    
+            } 
+        }
+      );
+      
+      $('.konten-dalam-jenazah').hide(); 
+      $('.konten-luar-jenazah').hide(); 
+      let domisili_jenazah= $(`#domisili_jenazah`).val()
+      
+      $('.konten-dalam-jenazah').hide(); 
+      $('.konten-luar-jenazah').hide(); 
+            if (domisili_jenazah == '') { 
+                $('.konten-dalam-jenazah').hide(); 
+                $('.konten-luar-jenazah').hide(); 
+            } 
+    
+            if (domisili_jenazah == '0') { 
+                $('.konten-dalam-jenazah').show(); 
+                $('.konten-luar-jenazah').hide(); 
+            }  
+    
+            if (domisili_jenazah == '1') { 
+                $('.konten-dalam-jenazah').hide(); 
+                $('.konten-luar-jenazah').show();    
+            } 
+      $('#domisili_jenazah').change(function(){ 
+            if ($(this).val() == '') { 
+                $('.konten-dalam-jenazah').hide(); 
+                $('.konten-luar-jenazah').hide(); 
+            } 
+    
+            if ($(this).val() == '0') { 
+                $('.konten-dalam-jenazah').show(); 
+                $('.konten-luar-jenazah').hide(); 
+            }  
+    
+            if ($(this).val() == '1') { 
+                $('.konten-dalam-jenazah').hide(); 
+                $('.konten-luar-jenazah').show();    
+            } 
+        }
+      );
+      // $('.konten-setuju').hide();
+
+      let verifikasi = $(`#verifikasi`).val()
+      if(verifikasi==1){
+        $('.konten-revisi').show();
+      }else{
+        $('.konten-revisi').hide();
+      }
+      // if(verifikasi==2){
+      //   $('.konten-setuju').show();
+      // }else{
+      //   $('.konten-setuju').hide();
+      // }
+      $('#verifikasi').change(function(){ 
+            if ($(this).val() == '') { 
+                $('.konten-revisi').hide(); 
+                // $('.konten-setuju').hide();
+            } 
+    
+            if ($(this).val() == '0') { 
+                $('.konten-revisi').hide(); 
+                // $('.konten-setuju').hide();
+
+            }  
+    
+            if ($(this).val() == '1') { 
+              $('.konten-revisi').show();   
+              // $('.konten-setuju').hide(); 
+            }
+            
+            if ($(this).val() == '2') { 
+              $('.konten-revisi').hide();    
+              // $('.konten-setuju').show();
+            }
+            if ($(this).val() == '3') { 
+              $('.konten-revisi').hide();    
+              // $('.konten-setuju').hide();
+            }
+        }
+      );
+    $(`#kecamatan_makam`).change(function () {
+      let kec = $(this).val()
+      $('#lokasi_makam').empty()
+      $('#blok_makam').empty()
+      $('#subblok_makam').empty()
+      $('#nomor_liang_makam').empty()
+      $('#agama_makam').empty()
+
+      $.get(`/permohonan_ijin/lokasiByKec?kec=${kec}`,function (data) {
+        console.log(data);
+        $(`#lokasi_makam`).append(`<option value="">-- Pilih --</option>`)
+        for (let i = 0; i < data.length; i++) {
+                    $(`#lokasi_makam`).append(`<option value="${data[i].master_makam_id}">${data[i].nama_tpu}</option>`)
+                
+            }
+        })
+      
+    })
+    $('#lokasi_makam').change(function () {
+      $('#blok_makam').empty()
+      $('#subblok_makam').empty()
+      $('#agama_makam').empty()
+      $('#nomor_liang_makam').empty()
+      $( "#agama_makam" ).append(
+                `<option value="">-- Pilih --</option>
+                <option value="1">Islam</option>
+                <option value="0">Non Islam</option>`)
+      // $.get(`/permohonan_ijin/blokByLokasi?lokasi=${$(this).val()}`,function (data) {
+      //   $(`#blok_makam`).append(`<option value="">-- Pilih --</option>`)
+      //   for (let i = 0; i < data.length; i++) {
+      //       if (data[i].blok) {
+      //         $(`#blok_makam`).append(`<option value="${data[i].blok}">${data[i].blok}</option>`)
+      //       }
+      //   }
+      // })
+    })
+
+    $('#agama_makam').change(function () {
+      $('#blok_makam').empty()
+      $('#subblok_makam').empty()
+      $('#nomor_liang_makam').empty()
+      $.get(`/permohonan_ijin/getBlokByAgama?agama=${$(this).val()}&master_makam_id=${$('#lokasi_makam').val()}`, function (data) {  
+          $(`#blok_makam`).append(`<option value="">-- Pilih --</option>`)
+
+          for (let i = 0; i < data.length; i++) {
+              console.log(data[i].blok);
+
+              if (data[i].blok) {
+                $(`#blok_makam`).append(`<option value="${data[i].blok}">${data[i].blok}</option>`)
+              }
+          }
+      })
+    })
+    $('#blok_makam').change(function () {
+      
+      $('#subblok_makam').empty()
+      $('#nomor_liang_makam').empty()
+
+      $.get(`/permohonan_ijin/subblokByBlok?blok=${$(this).val()}&agama=${$().val('#agama_makam').val()}&nama_tpu=${$('#lokasi_makam').val()}`, function (data) {   
+        data.data.sort((a,b)=>a.subblok.substring(1,a.subblok.length)-b.subblok.substring(1,b.subblok.length))
+        $(`#subblok_makam`).append(`<option value="">-- Pilih --</option>`)
+        for (let i = 0; i < data.data.length; i++) {
+            $(`#subblok_makam`).append(`<option value="${data.data[i].subblok}">${data.data[i].subblok}</option>`)
+        }
+      })
+    })
+    $('#subblok_makam').change(function () {
+      $('#nomor_liang_makam').empty()
+      $.get(`/permohonan_ijin/noliangBySubblok?jns_permohonan=4&subblok=${$(this).val()}&agama=${$().val('#agama_makam').val()}&nama_tpu=${$('#lokasi_makam').val()}&blok=${$('#blok_makam').val()}`,function (data) {
+        console.log(data);
+        if (data.length>0) {
+            $(`#nomor_liang_makam`).append(`<option value="">-- Pilih --</option>`)
+            for (let i = 0; i < data.length; i++) {
+                $(`#nomor_liang_makam`).append(`<option value="${data[i].id}">${data[i].no_liang}</option>`)
+            }
+       } else {
+            $(`#nomor_liang_makam`).append(`<option value="">Nomor liang tidak tersedia silahkan pilih blok lain</option>`)
+        }
+      })
+    })
+</script>

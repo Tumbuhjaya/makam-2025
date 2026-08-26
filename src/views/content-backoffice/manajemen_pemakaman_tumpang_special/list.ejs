@@ -1,0 +1,139 @@
+<% include ../../template-backoffice/header.ejs %>
+
+<!-- BEGIN PAGE CONTENT -->
+<div class="page-content">
+  <div class="header">
+    <h2><strong>Data Permohonan Ijin Pemakaman Tumpang</strong></h2>
+    <div class="breadcrumb-wrapper">
+      <ol class="breadcrumb">
+        <li><a href="/backoffice">Dashboard</a>
+        </li>
+        <li class="active">Data</li>
+      </ol>
+    </div>
+  </div>
+  
+  <div class="row">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      <div class="panel">
+        <div class="panel-header header-line">
+          <div class="alert alert-danger" role="alert">
+            <h6><strong>Pencarian berdasarkan status permohonan</strong></h6>
+            <div class="row">
+              <div class="col-md-12 col-lg-12">
+                <select name="" id="verifikasi" class="form-control">
+                  <option value="">-- Pilih --</option>
+                  <option value="0" <%= status === '0' ? 'selected':''%>>Belum Diverifikasi</option>
+                    <option value="1" <%= status === '1' ? 'selected':''%>>Revisi</option>
+                    <option value="4" <%= status === '4' ? 'selected':''%>>Di Revisi oleh User </option>
+                    <!-- <option value="3">Dibatalkan</option> -->
+                </select>
+
+                <button class="btn btn-primary btn-embossed" onclick="cari()" style="margin-top: 15px;">Cari</button>
+              </div>
+            </div>
+          </div>
+           <a class="btn btn-primary btn-embossed" href="/manajemen_permohonan/makam_tumpang/insert" role="button"><i class="fa fa-plus" aria-hidden="true"></i>Tambah Data</a>
+        </div>
+        <div class="panel-content pagination2 table-responsive">
+          <table class="table table-bordered table-striped table-hover" id="data">
+            <thead>
+              <tr>
+                <th class="header" rowspan="2">No.</th>
+                <th class="header" rowspan="2">Tanggal Permohonan</th>
+                <!-- <th class="header" rowspan="2" style="min-width: 100px;">Kode Registrasi</th> -->
+                <th class="header" rowspan="2" style="min-width: 150px;">Nama Pemohon/Ahli Waris</th>
+                <th class="header" rowspan="2" style="min-width: 150px;">Nama Jenazah</th>
+                <th class="header" colspan="2" style="text-align: center;">Tanggal</th>
+                <th class="header" colspan="4" style="text-align: center;">Lokasi Pemakaman</th>
+                <th class="header" colspan="3" style="text-align: center;">Retribusi & Pembayaran</th>
+                <th class="header" rowspan="2" style="min-width: 100px;">Status Permohonan</th>
+                <th class="header" rowspan="2" style="min-width: 100px;">Option</th>
+              </tr>
+
+              <tr>
+                <th class="header" style="min-width: 120px;">Meninggal</th>
+                <th class="header" style="min-width: 120px;">Dimakamkan</th>
+                <th class="header" style="min-width: 100px;">Kecamatan</th>
+                <th class="header" style="min-width: 100px;">Lokasi</th>
+                <th class="header" style="min-width: 100px;">Blok</th>
+                <th class="header" style="min-width: 100px;">Subblok</th>
+                <!-- <th class="header" style="min-width: 50px;">No. Liang</th> -->
+                <th class="header" style="min-width: 100px;">Retribusi</th>
+
+                <th class="header" style="min-width: 100px;">Kode Billing</th>
+                <th class="header" style="min-width: 100px;">Status</th>
+              </tr>
+            </thead>
+            
+            <tbody>
+              <%for(let i = 0 ;i<data.length ; i++){%>
+            <tr>
+              <td><%= i +1%></td>
+              <td><%= data[i].inserted%></td>
+              <!-- <td><%= data[i].pin%></td> -->
+              <td><%= data[i].nama_ahli_waris%></td>
+              <td><%= data[i].nama_jenazah%></td>
+              <td><%= data[i].tanggal_meninggal%></td>
+              <td><%= data[i].tanggal_dimakamkan%></td>
+              <td><%= data[i].kecamatan_tpu%></td>
+              <td><%= data[i].nama_tpu%></td>
+              <td><%= data[i].blok%></td>
+              <td><%= data[i].sub_blok%></td>
+              <!-- <td><%= data[i].no_liang%></td> -->
+              <td><%= data[i].retribusi%></td>
+              <td><%= data[i].kode_billing||''%></td>
+              <!-- <td>Belum Dibayar/Sudah Dibayar</td> -->
+              <td><%= 'sudah dibayar'||data[i].status_pembayaran%></td>
+              <td><%if(data[i].status_permohonan==null){%>Revisi<%}else{%><%= data[i].status_permohonan%><%}%></td>
+
+              <td>
+                <center>
+                <ul class="list-inline" style="text-align: center;">
+                  <li><a class="btn btn-warning btn-embossed btn-sm" href="/manajemen_pemakaman_special/pemakaman_tumpang/edit/<%= data[i].juuid%>" role="button" ><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a></li>
+                </ul>
+                </center>
+              </td>
+            </tr>
+            <%}%>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>  
+  </div>
+  <% include ../../template-backoffice/copyright.ejs %>
+</div>
+<!-- END PAGE CONTENT -->
+
+<% include ../../template-backoffice/footer.ejs %>
+
+<script type="text/javascript">
+  function cari() {
+    let status = $('#verifikasi').val()
+    location.href = `/manajemen_pemakaman_special/pemakaman_tumpang?status=${status}`
+  }
+  $(document).ready(function() {
+    $('#data').DataTable({
+      "language": {
+          "sProcessing":   "Sedang memproses...",
+          "sLengthMenu":   "_MENU_",
+          "sZeroRecords":  "Tidak ditemukan data yang sesuai",
+          "sInfo":         "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+          "sInfoEmpty":    "Menampilkan 0 sampai 0 dari 0 entri",
+          "sInfoFiltered": "(disaring dari _MAX_ entri keseluruhan)",
+          "sInfoPostFix":  "",
+          "sUrl":          "",
+          "oPaginate": {
+            "sFirst":    "Pertama",
+            "sPrevious": "Sebelumnya",
+            "sNext":     "Selanjutnya",
+            "sLast":     "Terakhir"
+          }
+      },
+      "columnDefs": [
+          { "width": "100px", "targets": 1}
+      ],
+    });
+  });
+</script>

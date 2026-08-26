@@ -1,0 +1,226 @@
+<% include ../../template-backoffice/header.ejs %>
+
+<!-- BEGIN PAGE CONTENT -->
+<div class="page-content">
+  <div class="header">
+    <h2><strong>Edit Data User</strong></h2>
+    <div class="breadcrumb-wrapper">
+      <ol class="breadcrumb">
+        <li><a href="/backoffice">Dashboard</a></li>
+        <li><a href="/user">Data User</a></li>
+        <li class="active">Edit Data</li>
+      </ol>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="panel">
+        <div class="panel-header header-line">
+          <!-- Notifikasi -->
+        </div>
+        <div class="panel-content">
+          <div class="row">
+            <div class="col-md-12">
+
+              <!-- Start form -->
+              <form role="form" action="/user/submit_edit" method="POST" enctype="multipart/form-data">
+                <input type="hidden" class="form-control" id="" name="id_user" value="<%= data[0]['id_user'] %>">
+                <div class="form-group">
+                  <label>Otoritas</label>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <select name="is_admin" id="otoritas" class="form-control">
+                        <option value="">-- Pilih --</option>
+                        <option value="1" <%if(1 == data[0].is_admin){%>selected<%}%>>Superadmin</option>
+                        <option value="3" <%if(3 == data[0].is_admin){%>selected<%}%>>Kepala Dinas</option>
+                        <option value="2" <%if(2 == data[0].is_admin){%>selected<%}%>>Kepala UPTD</option>
+                        <option value="0" <%if(0 == data[0].is_admin){%>selected<%}%>>Pengelola TPU</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group konten-tpu">
+                  <label>TPU</label>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <select name="master_makam_id" id="" class="form-control" data-search="true">
+                        <option value="">-- Pilih --</option>
+                        <%for(let i = 0 ;i<tpu.length ; i++){%>
+                          <option value="<%= tpu[i].id%>" <%if(tpu[i].id == data[0].master_makam_id){%>selected<%}%>><%= tpu[i].nama_tpu%></option>
+                        <%}%>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <div class="row">
+                    <div class="col-xs-12">
+                      <hr>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>Username</label>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <input type="text" class="form-control" id="" name="username" value="<%= data[0]['username'] %>" placeholder="Nama">
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>Password<br/><small>(Isi kembali dengan password lama, apabila anda tidak ingin menggantinya)</small></label>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <input type="password" class="form-control" id="" name="pwd">
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>Nama Lengkap</label>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <input type="text" class="form-control" id="" name="fullname"  value="<%= data[0]['fullname'] %>">
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group konten-kadis-uptd">
+                  <label>NIK</label>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <input type="text" class="form-control" id="NIK" name="NIK" value="<%= data[0]['NIK'] %>">
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>NIP</label>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <input type="text" class="form-control" id="" name="NIP" value="<%= data[0]['NIP'] %>">
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group konten-kadis-uptd">
+                  <label>Jabatan</label>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <input type="text" class="form-control" id="" name="jabatan" value="<%= data[0]['jabatan'] %>">
+                    </div>
+                  </div>
+                </div>
+                <!-- <button class="btn btn-primary btn-embossed" type="submit">Simpan Data Pemohon</button> -->
+              
+            
+
+                <div class="form-group">
+                  <label>Email</label>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <input type="text" class="form-control" id="" name="email" value="<%= data[0]['email'] %>">
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>Telepon</label>
+                  <div class="row">
+                    <div class="col-md-6"><input type="text" class="form-control" id="" name="telp" value="<%= data[0]['telp'] %>"></div>
+                  </div>
+                </div>
+
+                
+
+                
+                <button type="submit" class="btn btn-primary btn-embossed">Simpan</button>
+              </form>
+              <!-- End start form -->
+
+            </div>
+          </div>         
+        </div>
+      </div>
+    </div>  
+  </div>
+  <% include ../../template-backoffice/copyright.ejs %>
+</div>
+<!-- END PAGE CONTENT -->
+
+<% include ../../template-backoffice/footer.ejs %>
+<script>
+    $('.konten-tpu').hide(); 
+    $('.konten-kadis-uptd').hide(); 
+
+  let konten_tpu = $('#otoritas').val();
+  console.log(konten_tpu);
+  if (konten_tpu == '') { 
+                    $('.konten-tpu').hide(); 
+                    $('.konten-kadis-uptd').hide(); 
+                }
+        
+                if (konten_tpu == '1') { 
+                $('.konten-tpu').hide(); 
+                $('.konten-kadis-uptd').hide(); 
+    
+                }
+
+                if (konten_tpu == '0') { 
+                $('.konten-tpu').show(); 
+                $('.konten-kadis-uptd').hide(); 
+
+                }
+
+                if (konten_tpu == '3') { 
+                $('.konten-tpu').hide(); 
+                $('.konten-kadis-uptd').show(); 
+
+                }
+
+                if (konten_tpu == '2') { 
+                $('.konten-tpu').hide(); 
+                $('.konten-kadis-uptd').show(); 
+
+                }
+          $('#otoritas').change(function(){ 
+                if ($(this).val() == '') { 
+                    $('.konten-tpu').hide(); 
+                $('.konten-kadis-uptd').hide(); 
+
+                }
+        
+                if ($(this).val() == '1') { 
+                $('.konten-tpu').hide(); 
+                $('.konten-kadis-uptd').hide(); 
+
+    
+                }
+
+                if ($(this).val() == '0') { 
+                $('.konten-tpu').show(); 
+                $('.konten-kadis-uptd').hide(); 
+
+    
+                }
+
+                if ($(this).val() == '3') { 
+                $('.konten-tpu').hide(); 
+                $('.konten-kadis-uptd').show(); 
+
+    
+                }
+
+                if ($(this).val() == '2') { 
+                $('.konten-tpu').hide(); 
+                $('.konten-kadis-uptd').show(); 
+
+    
+                }
+            }
+        );
+</script>

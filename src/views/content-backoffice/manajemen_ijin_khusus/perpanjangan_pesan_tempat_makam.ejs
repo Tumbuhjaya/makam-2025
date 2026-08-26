@@ -1,0 +1,250 @@
+<% include ../../template-backoffice/header.ejs %>
+
+<!-- BEGIN PAGE CONTENT -->
+<div class="page-content">
+  <div class="header">
+    <h2><strong>Data Perpanjangan Ijin Pesan Tempat Pemakaman Jenazah</strong></h2>
+    <div class="breadcrumb-wrapper">
+      <ol class="breadcrumb">
+        <li><a href="/backoffice">Dashboard</a>
+        </li>
+        <li class="active">Data</li>
+      </ol>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      <div class="panel">
+        <div class="panel-header header-line">
+           <!-- <a class="btn btn-primary btn-embossed" href="/manajemen_basic/insert" role="button"><i class="fa fa-plus" aria-hidden="true"></i>Tambah Data</a> -->
+        </div>
+        <div class="panel-content pagination2">
+          <table class="table table-bordered table-striped table-hover" id="data">
+            <thead>
+              <tr>
+                <th class="header" rowspan="2">No.</th>
+                <th class="header" rowspan="2">Tanggal Permohonan</th>
+                <!-- <th class="header" rowspan="2" style="min-width: 100px;">Kode Registrasi</th> -->
+                <th class="header" rowspan="2" style="min-width: 150px;">Nama Pemohon/Ahli Waris</th>
+                <th class="header" rowspan="2" style="min-width: 150px;">Nama Jenazah</th>
+                <th class="header" colspan="2" style="text-align: center;">Tanggal</th>
+                <!-- <th class="header" rowspan="2" style="text-align: center;">Tanggal Dimakamkan</th> -->
+                <th class="header" colspan="5" style="text-align: center;">Lokasi Pemakaman</th>
+                <th class="header" colspan="2" style="text-align: center;">Retribusi & Pembayaran</th>
+                <th class="header" rowspan="2" style="min-width: 100px;">Masa Berlaku Perijinan Sampai Dengan</th>
+
+                <th class="header" rowspan="2" style="min-width: 410px;">Option</th>
+              </tr>
+
+              <tr>
+                <th class="header" style="min-width: 120px;">Meninggal</th>
+                <th class="header" style="min-width: 120px;">Dimakamkan</th>
+                <th class="header" style="min-width: 100px;">Kecamatan</th>
+                <th class="header" style="min-width: 50px;">Lokasi</th>
+                <th class="header" style="min-width: 50px;">Blok</th>
+                <th class="header" style="min-width: 50px;">Sub Blok</th>
+                <th class="header" style="min-width: 50px;">No. Liang</th>
+                <th class="header" style="min-width: 100px;">Kode Billing</th>
+                <th class="header" style="min-width: 100px;">Status</th>
+              </tr>
+            </thead>
+            
+            <tbody>
+              
+
+            <%for(let i = 0 ;i<data.length ; i++){%>
+              <tr>
+                <td><%= i +1%></td>
+                <td><%= data[i].inserted%></td>
+                <!-- <td><%= data[i].pin%></td> -->
+                <td><%= data[i].nama_ahli_waris%></td>
+                <td><%= data[i].nama_jenazah%></td>
+                <td><%= data[i].tanggal_meninggal%></td>
+                <td><%= data[i].tanggal_dimakamkan%></td>
+                <td><%= data[i].kecamatan%></td>
+                <td><%= data[i].nama_tpu%></td>
+                <td><%= data[i].blok%></td>
+                <td><%= data[i].sub_blok%></td>
+                <td><%= data[i].no_liang%></td>
+                <td><%= data[i].kode_billing%></td>
+                <!-- <td>Belum Dibayar/Sudah Dibayar</td> -->
+                <td><%= data[i].status_pembayaran%></td>
+                <td>
+                  <%if(data[i].tanggal_berlaku_surat){%>
+                  <%if(data[i].kadaluarsa == '0'){%>
+                    <span class="label label-success"><%= data[i].tanggal_berlaku_surat%></span>
+                  <%}else{%>
+                    <span class="label label-danger"><%= data[i].tanggal_berlaku_surat%></span>
+                  <%}%>
+                  <%}%>
+                </td>
+                <td>
+                  <center>
+                    <ul class="list-inline" style="text-align: center;">
+                      <li><button class="btn btn-warning btn-embossed btn-sm cetak_sk" data-jenazah_id="<%= data[i].jenazah_id%>" data-dokument_id="<%= data[i].dokument_id%>"   data-id="<%= data[i].perpanjangan_id%>" data-toggle="modal" data-target=".modal-cetak-sk">Buat Draft SK</button></li>
+                      <%if(data[i].cek=='true'&&data[i].status_pembayaran == 'Sudah Dibayar'){%>
+                        <li><a class="btn btn-success btn-embossed btn-sm" target="_blank" href="/manajemen_perijinan/pemakaman/cetak_perpanjangan/<%= data[i].jenazah_id%>" role="button">Cetak Draft SK</a></li>
+                        <li><button class="btn btn-info btn-embossed btn-sm upload_sk" role="button" style="margin-right: 0;" data-perpanjangan_id="<%= data[i].perpanjangan_id%>" data-toggle="modal"  data-target="#exampleModal">Upload SK</button></li>
+                        
+                        <%}%>
+                        
+                      <%if(data[i].sk_perpanjangan!= null){%>
+                        <li><a href="/foto/<%= data[i].sk_perpanjangan%>" class="btn btn-dark btn-sm btn-embossed" download>Download SK</a></li>
+                      <%}%>
+                      <li><a class="btn btn-success btn-embossed btn-sm" target="_blank" href="/manajemen_master/data_jenazah/edit/<%= data[i].jenazah_id%>/6" role="button" >Edit Jenazah</a></li>
+
+                    </ul>
+                    </center>
+                </td>
+              </tr>
+              <%}%>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>  
+  </div>
+  <% include ../../template-backoffice/copyright.ejs %>
+</div>
+<!-- END PAGE CONTENT -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Upload SK yang sudah ditandatangani</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form action="/manajemen_perijinan/uploadSKPerpanjangan" method="post" enctype="multipart/form-data">
+          <div class="form-group">
+            <label>Upload SK</label>
+            <input type="file" class="form-control" name="sk_perpanjangan" id=""  accept="image/*,.pdf">
+            <input type="text" name="id" id="perpanjangan_id" hidden>
+            <input type="text" class="" name="jns_permohonan" id="" value="2" hidden>
+
+          </div>
+          <button type="submit" class="btn btn-primary">Upload</button>
+        </form>
+      </div>
+      <!-- <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div> -->
+    </div>
+  </div>
+</div>
+
+<div class="modal fade modal-cetak-sk" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <form action="/manajemen_perijinan/inputDataSKPerpanjangan" method="post"   enctype="application/x-www-form-urlencoded" class="form-horizontal">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" id="myModalLabel">Buat Draft SK Perpanjangan Ijin Pemakaman Jenazah</h4>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="" class="col-sm-3 control-label">No. Surat</label>
+            <div class="col-sm-9">
+              <input type="text" class="form-control" name="nomor_surat" id="nomor_surat" value="">
+            </div>
+          </div>
+          <input type="text" class="perpanjangan_id" name="id" id="" hidden>
+          <input type="text" class="jenazah_id" name="jenazah_id" id="" hidden>
+          <input type="text" class="" name="jns_permohonan" id="" value="2" hidden>
+
+          <div class="form-group">
+            <label for="" class="col-sm-3 control-label">Tanggal Penetapan</label>
+            <div class="col-sm-9">
+              <input type="text" class="form-control" name="tanggal_surat" id="tgl3" value="" >
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="" class="col-sm-3 control-label">Penandatangan</label>
+            <div class="col-sm-9" id="penandatangan_id">
+              <select name="" id="" class="form-control">
+                <option value="">-- Pilih --</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <!-- <button type="button" class="btn btn-default" data-dismiss="modal">Close</button> -->
+          <button type="submit" class="btn btn-primary">Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<% include ../../template-backoffice/footer.ejs %>
+
+<script type="text/javascript">
+  $(document).ready(function() {
+    // $(`.upload_sk`).click(function () {
+    //   let x = $('.upload_sk').data('dokument')
+    //   console.log(x);
+    //   $('#dokument_id').val(x)
+    // })
+    $(`.cetak_sk`).click(function () {
+      let id = $(this).data('id')
+      let jenazah_id = $(this).data('jenazah_id')
+      let dokument_id = $(this).data('dokument_id')
+
+      $(`.perpanjangan_id`).val(id)
+      $(`.jenazah_id`).val(jenazah_id)
+      $.get(`/manajemen_perijinan/getPerpanjanganById?dokument=${dokument_id}`,function (data) {
+        let x = data.data[0]
+        $(`#nomor_surat`).val(x.nomor_surat)
+        // $(`#tgl3`).val(x.tanggal_berlaku_surat)
+                                  $(`#tgl3`).val(x.tanggal_surat)
+
+        $.get(`/manajemen_perijinan/getPenandatangan`,function (data) {
+          $(`#penandatangan_id`).empty()
+          console.log(data);
+          let a = '<select name="penandatangan_id"  class="form-control">'
+          a+=  '<option value="">-- Pilih --</option>'
+          for (let i = 0; i < data.data.length; i++) {
+              a+=`<option value="${data.data[i].id}" ${data.data[i].id == x.penandatangan_id?'selected':''}>${data.data[i].nama}</option>`
+          }
+           a += '</div>'
+           $(`#penandatangan_id`).append(a)
+      })
+   
+      })
+    })
+    $(document).on("click", ".upload_sk", function () {
+            let id = $(this).data('perpanjangan_id');
+            console.log(id);
+            $('#perpanjangan_id').val(id)
+        });
+    $('#data').DataTable({
+      "language": {
+          "sProcessing":   "Sedang memproses...",
+          "sLengthMenu":   "_MENU_",
+          "sZeroRecords":  "Tidak ditemukan data yang sesuai",
+          "sInfo":         "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+          "sInfoEmpty":    "Menampilkan 0 sampai 0 dari 0 entri",
+          "sInfoFiltered": "(disaring dari _MAX_ entri keseluruhan)",
+          "sInfoPostFix":  "",
+          "sUrl":          "",
+          "oPaginate": {
+            "sFirst":    "Pertama",
+            "sPrevious": "Sebelumnya",
+            "sNext":     "Selanjutnya",
+            "sLast":     "Terakhir"
+          }
+      },
+      "columnDefs": [
+          { "width": "100px", "targets": 1}
+      ],
+    });
+  });
+  if ('<%=cetak%>'!='undefined') {
+    window.open(`/manajemen_perijinan/pemakaman/cetak_perpanjangan/<%=cetak%>`, '_blank');
+
+  }
+</script>

@@ -1,0 +1,166 @@
+<% include ../../template-backoffice/header.ejs %>
+
+<!-- BEGIN PAGE CONTENT -->
+<div class="page-content">
+  <div class="header">
+    <h2><strong>Data Ijin Pesan Tempat Makam</strong></h2>
+    <div class="breadcrumb-wrapper">
+      <ol class="breadcrumb">
+        <li><a href="/backoffice">Dashboard</a>
+        </li>
+        <li class="active">Data</li>
+      </ol>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      <div class="panel">
+        <div class="panel-header header-line">
+           <!-- <a class="btn btn-primary btn-embossed" href="/manajemen_basic/insert" role="button"><i class="fa fa-plus" aria-hidden="true"></i>Tambah Data</a> -->
+        </div>
+        <div class="panel-content pagination2">
+          <table class="table table-bordered table-striped table-hover" id="data">
+            <thead>
+              <tr>
+                <th class="header" rowspan="2">No.</th>
+                <th class="header" rowspan="2">Tanggal Permohonan</th>
+                <th class="header" rowspan="2">Kode Registrasi</th>
+                <th class="header" rowspan="2">Nama Pemohon</th>
+                <th class="header" rowspan="2">No. KTP</th>
+                <th class="header" rowspan="2">No. Hp</th>
+                <th class="header" rowspan="2">Email</th>
+                <th class="header" rowspan="2">Alamat Lengkap</th>
+                <th class="header" colspan="5" style="text-align: center;">Lokasi Pemakaman</th>
+                <th class="header" colspan="3" style="text-align: center;">Retribusi & Pembayaran</th>
+                <th class="header" rowspan="2">Masa Berlaku Perijinan Sampai Dengan</th>
+                <th class="header" rowspan="2" style="min-width: 280px;">Option</th>
+              </tr>
+              <tr>
+                <th class="header">Kecamatan</th>
+                <th class="header">Lokasi</th>
+                <th class="header">Blok</th>
+                <th class="header">Subblok</th>
+                <th class="header">No. Liang</th>
+
+                <th class="header">Retribusi</th>
+                <th class="header">Kode Billing</th>
+                <th class="header">Status</th>
+
+              </tr>
+            </thead>
+            
+            <tbody>
+              <%for(let i = 0 ;i<data.length ; i++){%>
+            <tr>
+              <td><%= i+1%></td>
+              <td><%= data[i].inserted%></td>
+              <td><%= data[i].pin%></td>
+              <td><%= data[i].nama_ahli_waris%></td>
+              <td><%= data[i].nik%></td>
+              <td><%= data[i].hp%></td>
+              <td><%= data[i].email%></td>
+              <td><%= data[i].alamat%></td>
+              <td><%= data[i].kecamatan%></td>
+              <td><%= data[i].nama_tpu%></td>
+              <td><%= data[i].blok%></td>
+              <td><%= data[i].sub_blok%></td>
+              <td><%= data[i].no_liang%></td>
+              <td><%= data[i].retribusi%></td>
+              <td><%= data[i].kode_billing%></td>
+              <td><%= data[i].status_pembayaran%></td>
+              <td>
+                <!-- <span class="label label-success">00-00-0000</span>
+                <span class="label label-danger">00-00-0000</span> -->
+                <%if(data[i].kadaluarsa == '0'){%>
+                  <span class="label label-success"><%= data[i].tanggal_berlaku_surat%></span>
+                <%}else{%>
+                  <span class="label label-danger"><%= data[i].tanggal_berlaku_surat%></span>
+                <%}%>
+              </td>
+              <td>
+                <center>
+                <ul class="list-inline" style="text-align: center;">
+                  <%if(data[i].periode!=0){%>
+                  <li><button class="btn btn-warning btn-embossed btn-sm upload_sk" role="button" style="margin-right: 0;" data-toggle="modal" data-dokument="<%= data[i].dokument_id%>" data-target="#exampleModal">Upload SK</button></li>
+                  <%}%>
+                  <li><a class="btn btn-info btn-embossed btn-sm" href="/manajemen_perijinan/pesan_tempat_makam/cetak/<%= data[i].jenazah_id%>" role="button" >Cetak SK</a></li>
+                  <%if(data[i].sk){%>
+                  <li><a href="/foto/<%= data[i].sk%>" class="btn btn-success btn-sm btn-embossed" download>Download SK</a></li>
+                  <%}%>
+                  <li><a class="btn btn-success btn-embossed btn-sm" target="_blank" href="/manajemen_master/data_jenazah/edit/<%= data[i].jenazah_id%>/3" role="button" >Edit Jenazah</a></li>
+                </ul>
+                </center>
+              </td>
+            </tr>
+            <%}%>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>  
+  </div>
+  <% include ../../template-backoffice/copyright.ejs %>
+</div>
+<!-- END PAGE CONTENT -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Upload SK yang sudah ditandatangani</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form action="#" method="post" enctype="multipart/form-data">
+          <div class="form-group">
+            <label>Upload SK</label>
+            <input type="file" class="form-control" name="" id="">
+            <input type="text" name="id" id="dokument_id" hidden>
+          </div>
+          <button type="submit" class="btn btn-primary">Upload</button>
+        </form>
+      </div>
+      <!-- <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div> -->
+    </div>
+  </div>
+</div>
+<% include ../../template-backoffice/footer.ejs %>
+
+<script type="text/javascript">
+  $(document).ready(function() {
+    $(document).on("click", ".upload_sk", function () {
+            let id = $(this).data('dokument');
+            console.log(id);
+            $('#dokument_id').val(id)
+        });
+    $('#data').DataTable({
+      "language": {
+          "sProcessing":   "Sedang memproses...",
+          "sLengthMenu":   "_MENU_",
+          "sZeroRecords":  "Tidak ditemukan data yang sesuai",
+          "sInfo":         "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+          "sInfoEmpty":    "Menampilkan 0 sampai 0 dari 0 entri",
+          "sInfoFiltered": "(disaring dari _MAX_ entri keseluruhan)",
+          "sInfoPostFix":  "",
+          "sUrl":          "",
+          "oPaginate": {
+            "sFirst":    "Pertama",
+            "sPrevious": "Sebelumnya",
+            "sNext":     "Selanjutnya",
+            "sLast":     "Terakhir"
+          }
+      },
+      "columnDefs": [
+          { "width": "100px", "targets": 1}
+      ],
+    });
+  });
+  if ('<%=cetak%>'!='undefined') {
+    window.open(`/manajemen_perijinan/pemakaman/cetak/<%=cetak%>`, '_blank');
+
+  }
+</script>

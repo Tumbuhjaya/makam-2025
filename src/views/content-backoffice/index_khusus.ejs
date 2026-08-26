@@ -1,0 +1,430 @@
+<% include ../template-backoffice/header.ejs %>
+<style>
+  table{
+    font-size: 14px !important;
+    margin-bottom: 15px 0 !important;
+  }
+  td{
+    padding: 5px !important;
+  }
+</style>
+<!-- BEGIN PAGE CONTENT -->
+<div class="page-content">
+  <div class="header">
+    <!-- <h2><strong>Dashboard</strong></h2> -->
+    <!-- <div class="breadcrumb-wrapper">
+      <ol class="breadcrumb">
+        <li class="active">Dashboard</li>
+      </ol>
+    </div> -->
+  </div>
+  <div class="row">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="tab tab-light clearfix"> 
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="active"><a href="#tab2-1" data-toggle="tab" aria-expanded="false" style="padding: 10px 15px;"><span class="font-custom" style="font-size: 14px;">PERMOHONAN IJIN</span></a></li>
+                <li><a href="#tab2-2" data-toggle="tab" aria-expanded="false" style="padding: 10px 15px;"><span class="font-custom" style="font-size: 14px;">PERPANJANGAN IJIN</span></a></li>
+            </ul>
+        </div>
+
+        <div role="tabpanel" class="tab-pane fade active in" id="tab2-1">
+            <div class="panel">
+                <div class="panel-content">
+                    <div class="row">
+                         <div id="permohonan-container"></div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                            <div style="width: 100%;display: flex;justify-content: center;align-items: center;">
+                                <div id="pagination-permohonan"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div role="tabpanel" class="tab-pane fade" id="tab2-2">
+            <div class="panel">
+                <div class="panel-content">
+                    <div class="row">
+                        <div id="perpanjangan-container"></div>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div class="row">
+                 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                    <div style="width: 100%;display: flex;justify-content: center;align-items: center;">
+                        <div id="pagination-perpanjangan"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+  </div>
+  
+  <% include ../template-backoffice/copyright.ejs %>
+</div>
+<!-- END PAGE CONTENT -->
+
+<% include ../template-backoffice/footer.ejs %>
+
+
+<script>
+    $(".konten-revisi").hide();
+
+  $("#verifikasi").change(function () {
+    if ($(this).val() == "") {
+      $(".konten-revisi").hide();
+    }
+
+    if ($(this).val() == "0") {
+      $(".konten-revisi").hide();
+    }
+
+    if ($(this).val() == "1") {
+      $(".konten-revisi").show();
+    }
+
+    if ($(this).val() == "2") {
+      $(".konten-revisi").hide();
+    }
+
+    if ($(this).val() == "3") {
+      $(".konten-revisi").hide();
+    }
+  });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Fungsi untuk memuat data dan merender konten
+        async function loadContent(url, containerId, paginationId, type) {
+            try {
+                const response = await fetch(url);
+                const result = await response.json();
+                    console.log(result);
+                    
+                // Render konten data
+                renderCards(result.data, containerId, type);
+
+                // Render pagination
+                renderPagination(result, paginationId, type);
+
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        // Fungsi untuk merender card permohonan/perpanjangan
+        function renderCards(data, containerId, type) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            let html = '';
+            
+            if (data.length === 0) {
+                html = `<div class="col-xs-12"><p class="text-center">Tidak ada data.</p></div>`;
+            } else {
+                 data.forEach(item => {
+           console.log(item);
+           
+                    if (type === 'permohonan') {
+                        html += `
+                            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6" style="margin-top: 15px;">
+                                <div style="width: 100%;padding:15px;border:1px solid #ddd;border-radius: 4px;">
+                                    <div class="row">
+                                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                            <center>
+                                                <h6 style="margin-bottom: 0;"><strong>Tanggal Permohonan</strong></h6>
+                                                <h4 style="text-align: center;margin: 2.5px 0 0 0;"><strong>${item.inserted}</strong></h4>
+                                            </center>
+                                            <hr>
+                                        </div>
+                                    </div>
+                                    <div class="row" style="margin-top: 10px;">
+                                        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                                            <h6 style="margin-bottom: 0;"><strong>Jenis Perijinan</strong></h6>
+                                            ${item.jns_pemakaman == 0 ? '<button type="button" class="btn btn-warning btn-sm" style="cursor: default;margin:2.5px 0 0 0">Penggunaan Tanah Makam/Pemakaman Jenazah</button>' : 
+                                              item.jns_pemakaman == 2 ? '<button type="button" class="btn btn-warning btn-sm" style="cursor: default;margin:2.5px 0 0 0">Pesan Tempat Makam</button>' : 
+                                              item.jns_pemakaman == 4 ? '<button type="button" class="btn btn-warning btn-sm" style="cursor: default;margin:2.5px 0 0 0">Pemakaman Tumpang</button>' : ''}
+                                        </div>
+                                        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                                            <h6 style="text-align: right;margin-bottom: 0;"><strong>Status Permohonan</strong></h6>
+                                            <button type="button" class="btn btn-info btn-sm pull-right" style="cursor: default;margin-right: 0;margin-top:2.5px">${item.status_permohonan}</button>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                            <center>
+                                                <h6 style="text-align: center;margin: 0;"><strong>Status Pembayaran</strong></h6>
+                                                <button type="button" class="btn btn-success btn-sm" style="cursor: default;margin-top: 2.5px;">${item.status_pembayaran}</button>
+                                            </center>
+                                            <hr>
+                                        </div>
+                                    </div>
+                                    <div class="row" style="margin-top: 15px;">
+                                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 table-no-border">
+                                            <table class="table table-bordered">
+                                                <tbody>
+                                                    <tr>
+                                                        <td style="width: 130px;vertical-align: top;">Pemohon</td>
+                                                        <td style="width: 5px;vertical-align: top;">:</td>
+                                                        <td style="vertical-align: top;">${item.foto_ktp_pemohon ? `<a href="/foto/${item.foto_ktp_pemohon}" data-fancybox="${item.id}" title="KTP Ahli Waris">${item.nama_ahli_waris}</a>` : item.nama_ahli_waris}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="vertical-align: top;">Jenazah</td>
+                                                        <td style="vertical-align: top;">:</td>
+                                                        <td style="vertical-align: top;">${item.foto_ktp_jenazah ? `<a href="/foto/${item.foto_ktp_jenazah}" data-fancybox="${item.id}" title="KTP Jenazah">${item.nama_jenazah}</a>` : item.nama_jenazah}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Tgl. dimakamkan</td>
+                                                        <td>:</td>
+                                                        <td>${item.tanggal_dimakamkan}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Lokasi Makam</td>
+                                                        <td>:</td>
+                                                        <td>${item.nama_tpu?item.nama_tpu:item.pilihan_nama_tpu?item.pilihan_nama_tpu:'-'}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="vertical-align: top;">Blok / Subblok </td>
+                                                        <td style="vertical-align: top;">:</td>
+                                                        <td style="vertical-align: top;">${item.blok?item.blok:item.pilihan_blok?item.pilihan_blok:'-'} / ${item.sub_blok?item.sub_blok:item.pilihan_sub_blok?item.pilihan_sub_blok:'-'}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="vertical-align: top;">Surat Kematian RS/RT/RW</td>
+                                                        <td style="vertical-align: top;">:</td>
+                                                        <td style="vertical-align: top;">${item.surat_kematian ? `<a href="/foto/${item.surat_kematian}" data-fancybox="${item.id}" title="Surat Kematian RS/RT/RW"><button class="btn btn-primary btn-sm">Lihat File</button></a>` : ''}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="vertical-align: top;">Surat Dari Lurah/Catatan Sipil</td>
+                                                        <td style="vertical-align: top;">:</td>
+                                                        <td style="vertical-align: top;">${item.surat_lurah ? `<a href="/foto/${item.surat_lurah}" data-fancybox="${item.id}" title="Surat Dari Lurah/Catatan Sipil"><button class="btn btn-primary btn-sm">Lihat File</button></a>` : ''}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                            <hr style="margin: 0;">
+                                        </div>
+                                    </div>
+                                    <div class="row" style="margin-top: 15px;">
+                                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                            <form action="/update_status_permohonan" method="post" enctype="application/x-www-form-urlencoded">
+                                                <input type="hidden" name="perpanjangan_id" value="${item.perpanjangan_id}">
+                                                <input type="hidden" name="jenazah_id" value="${item.jenazah_id}">
+                                                <input type="hidden" name="email_pemohon" value="${item.email_pemohon}">
+                                                <input type="hidden" name="dokument_id" value="${item.dokument_id}">
+                                                <input type="hidden" name="tpu" value="${item.tpu}">
+                                                <input type="hidden" name="pilihan_blok" value="${item.pilihan_blok}">
+                                                <input type="hidden" name="pilihan_sub_blok" value="${item.pilihan_sub_blok}">
+                                                <input type="hidden" name="hp" value="${item.hp}">
+                                                <input type="hidden" name="makam_id" value="${item.makam_jenazah_id}">
+                                                <input type="hidden" name="jns_pemakaman" value="${item.jns_pemakaman}">
+                                                <div class="form-group">
+                                                    <select name="status" id="verifikasi" class="form-control">
+                                                        <option value="">-- Verifikasi Permohonan --</option>
+                                                        <option value="0" ${item.status == 0 ? 'selected' : ''}>Belum Diverifikasi</option>
+                                                        <option value="1" ${item.status == 1 ? 'selected' : ''}>Revisi</option>
+                                                        <option value="2" ${item.status == 2 ? 'selected' : ''}>Disetujui</option>
+                                                        <option value="3" ${item.status == 3 ? 'selected' : ''}>Dibatalkan</option>
+                                                    </select>
+                                                </div>
+                                                <div class="form-group konten-revisi">
+                                                    <label for="">Catatan Revisi</label>
+                                                    <textarea name="catatan_revisi" id="" cols="30" rows="10" class="form-control" placeholder=" ">${item.catatan_revisi}</textarea>
+                                                </div>
+                                                <div class="form-group">
+                                                    <button type="submit" class="btn btn-primary btn-block">Simpan</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    } else if (type === 'perpanjangan') {
+                        html += `
+                            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6" style="margin-top: 15px;">
+                                <div style="width: 100%;padding:15px;border:1px solid #ddd;border-radius: 4px;">
+                                    <div class="row">
+                                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                            <center>
+                                                <h6 style="margin-bottom: 0;"><strong>Tanggal Permohonan</strong></h6>
+                                                <h4 style="text-align: center;margin: 2.5px 0 0 0;"><strong>${item.inserted}</strong></h4>
+                                            </center>
+                                            <hr>
+                                        </div>
+                                    </div>
+                                    <div class="row" style="margin-top: 10px;">
+                                        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                                            <h6 style="margin-bottom: 0;"><strong>Jenis Perijinan</strong></h6>
+                                            ${item.jns_pemakaman == 0 ? '<button type="button" class="btn btn-warning btn-sm" style="cursor: default;margin:2.5px 0 0 0">Perpanjangan Ijin Penggunaan Tanah Makam</button>' : 
+                                              item.jns_pemakaman == 2 ? '<button type="button" class="btn btn-warning btn-sm" style="cursor: default;margin:2.5px 0 0 0">Perpanjangan Ijin Pesan Tempat </button>' : 
+                                              item.jns_pemakaman == 4 ? '<button type="button" class="btn btn-warning btn-sm" style="cursor: default;margin:2.5px 0 0 0">Perpanjangan Ijin Pemakaman Tumpang</button>' : ''}
+                                        </div>
+                                        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                                            <h6 style="margin-bottom: 0;text-align: right;"><strong>Status Permohonan</strong></h6>
+                                            <button type="button" class="btn btn-info btn-sm pull-right" style="cursor: default;margin-right: 0;margin-top:2.5px">Belum Diverifikasi</button>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                            <center>
+                                                <h5 style="text-align: center;margin: 0;"><strong>Status Pembayaran</strong></h5>
+                                                <button type="button" class="btn btn-success btn-sm" style="cursor: default;margin-top: 2.5px;">${item.status_pembayaran}</button>
+                                            </center>
+                                            <hr>
+                                        </div>
+                                    </div>
+                                    <div class="row" style="margin-top: 15px;">
+                                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 table-no-border">
+                                            <table class="table table-bordered">
+                                                <tbody>
+                                                    <tr>
+                                                        <td style="width: 130px;vertical-align: top;">Pemohon</td>
+                                                        <td style="width: 5px;vertical-align: top;">:</td>
+                                                        <td style="vertical-align: top;">${item.foto_ktp_pemohon ? `<a href="/foto/${item.foto_ktp_pemohon}" data-fancybox="${item.id}" title="KTP Ahli Waris">${item.nama_ahli_waris}</a>` : item.nama_ahli_waris}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="vertical-align: top;">Jenazah</td>
+                                                        <td style="vertical-align: top;">:</td>
+                                                        <td style="vertical-align: top;">${item.foto_ktp_jenazah ? `<a href="/foto/${item.foto_ktp_jenazah}" data-fancybox="${item.id}" title="KTP Jenazah">${item.nama_jenazah}</a>` : item.nama_jenazah}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Tgl. dimakamkan</td>
+                                                        <td>:</td>
+                                                        <td>${item.tanggal_dimakamkan}</td>
+                                                    </tr>
+                                                     <tr>
+                                                        <td>Lokasi Makam</td>
+                                                        <td>:</td>
+                                                        <td>${item.nama_tpu?item.nama_tpu:item.pilihan_nama_tpu?item.pilihan_nama_tpu:'-'}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="vertical-align: top;">Blok / Subblok </td>
+                                                        <td style="vertical-align: top;">:</td>
+                                                        <td style="vertical-align: top;">${item.blok?item.blok:item.pilihan_blok?item.pilihan_blok:'-'} / ${item.sub_blok?item.sub_blok:item.pilihan_sub_blok?item.pilihan_sub_blok:'-'}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="vertical-align: top;">Surat Kematian RS/RT/RW</td>
+                                                        <td style="vertical-align: top;">:</td>
+                                                        <td style="vertical-align: top;">${item.surat_kematian ? `<a href="/foto/${item.surat_kematian}" data-fancybox="${item.id}" title="Surat Kematian RS/RT/RW"><button class="btn btn-primary btn-sm">Lihat File</button></a>` : ''}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="vertical-align: top;">Surat SK Lama</td>
+                                                        <td style="vertical-align: top;">:</td>
+                                                        <td style="vertical-align: top;">${item.sk_lama ? `<a href="/foto/${item.sk_lama}" data-fancybox="${item.id}" title="Surat SK Lama"><button class="btn btn-primary btn-sm">Lihat File</button></a>` : ''}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="vertical-align: top;">Surat Dari Lurah/Catatan Sipil</td>
+                                                        <td style="vertical-align: top;">:</td>
+                                                        <td style="vertical-align: top;">${item.surat_lurah ? `<a href="/foto/${item.surat_lurah}" data-fancybox="${item.id}" title="Surat Dari Lurah/Catatan Sipil"><button class="btn btn-primary btn-sm">Lihat File</button></a>` : ''}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                            <hr style="margin: 0;">
+                                        </div>
+                                    </div>
+                                    <div class="row" style="margin-top: 15px;">
+                                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                            <form action="/update_status_khusus" method="post" enctype="application/x-www-form-urlencoded">
+                                                <input type="hidden" name="perpanjangan_id" value="${item.perpanjangan_id}">
+                                                <input type="hidden" name="email_pemohon" value="${item.email_pemohon}">
+                                                <input type="hidden" name="hp" value="${item.hp}">
+                                                <input type="hidden" name="makam_id" value="${item.makam_jenazah_id}">
+                                                <input type="hidden" name="jns_pemakaman" value="${item.jns_pemakaman}">
+                                                <input type="hidden" name="tujuan" value="/backoffice_khusus">
+
+                                                <div class="form-group">
+                                                    <select name="status" id="" class="form-control">
+                                                        <option value="">-- Verifikasi Permohonan --</option>
+                                                        <option value="0" ${item.status == 0 ? 'selected' : ''}>Belum Diverifikasi</option>
+                                                        <option value="2" ${item.status == 2 ? 'selected' : ''}>Disetujui</option>
+                                                        
+                                                    </select>
+                                                </div>
+                                                 <div class="form-group">
+                                                    <label for="">Perpanjangan Ke ?</label>
+                                                    <input type="text" class="form-control" id="perpanjangan_ke" name="perpanjangan_ke" placeholder="">
+                                                </div>
+                                                <div class="form-group">
+                                                    <button type="submit" class="btn btn-primary btn-block">Simpan</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                });
+            }
+            container.innerHTML = html;
+        }
+
+        // Fungsi untuk merender pagination
+        function renderPagination(data, paginationId, type) {
+            const paginationContainer = document.getElementById(paginationId);
+            const { currentPage, totalPages, limit } = data;
+            
+            let paginationHtml = `<ul class="pagination">`;
+
+            // Tombol "First" dan "Prev"
+            if (currentPage > 1) {
+                paginationHtml += `<li><a href="#" data-page="1" data-type="${type}" class="page-link">First</a></li>`;
+                paginationHtml += `<li><a href="#" data-page="${currentPage - 1}" data-type="${type}" class="page-link">Prev</a></li>`;
+            }
+
+            // Halaman 1 sebelum current
+            if (currentPage > 1) {
+                 paginationHtml += `<li><a href="#" data-page="${currentPage - 1}" data-type="${type}" class="page-link">${currentPage - 1}</a></li>`;
+            }
+
+            // Halaman saat ini
+            paginationHtml += `<li class="active"><a href="#">${currentPage}</a></li>`;
+
+            // Halaman 1 setelah current
+            if (currentPage < totalPages) {
+                paginationHtml += `<li><a href="#" data-page="${currentPage + 1}" data-type="${type}" class="page-link">${currentPage + 1}</a></li>`;
+            }
+
+            // Tombol "Next" dan "Last"
+            if (currentPage < totalPages) {
+                paginationHtml += `<li><a href="#" data-page="${currentPage + 1}" data-type="${type}" class="page-link">Next</a></li>`;
+                paginationHtml += `<li><a href="#" data-page="${totalPages}" data-type="${type}" class="page-link">Last</a></li>`;
+            }
+
+            paginationHtml += `</ul>`;
+            paginationContainer.innerHTML = paginationHtml;
+        }
+
+        // Event listener untuk klik pada tombol pagination
+        document.body.addEventListener('click', (e) => {
+            if (e.target.classList.contains('page-link')) {
+                e.preventDefault();
+                const page = e.target.dataset.page;
+                const type = e.target.dataset.type;
+
+                if (type === 'permohonan') {
+                    loadContent(`/api/permohonan_khusus?page=${page}&limit=10`, 'permohonan-container', 'pagination-permohonan', 'permohonan');
+                } else if (type === 'perpanjangan') {
+                    loadContent(`/api/perpanjangan_khusus?page=${page}&limit=10`, 'perpanjangan-container', 'pagination-perpanjangan', 'perpanjangan');
+                }
+            }
+        });
+
+        // Muat data default saat halaman pertama kali dimuat
+        loadContent('/api/permohonan_khusus?page=1&limit=10', 'permohonan-container', 'pagination-permohonan', 'permohonan');
+        loadContent('/api/perpanjangan_khusus?page=1&limit=10', 'perpanjangan-container', 'pagination-perpanjangan', 'perpanjangan');
+
+    });
+</script>
+    

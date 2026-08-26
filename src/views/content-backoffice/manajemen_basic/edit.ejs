@@ -1,0 +1,99 @@
+<% include ../../template-backoffice/header.ejs %>
+
+<!-- BEGIN PAGE CONTENT -->
+<div class="page-content">
+  <div class="header">
+    <h2><strong>Edit Data RTLH</strong></h2>
+    <div class="breadcrumb-wrapper">
+      <ol class="breadcrumb">
+        <li><a href="/backoffice">Dashboard</a></li>
+        <li><a href="/manajemen_basic">Data</a></li>
+        <li class="active">Edit Data</li>
+      </ol>
+    </div>
+  </div>
+  
+  <div class="row">
+      <div style="width: 100%;height:500px;background-color: #f3f3f3;" id="map"></div>
+  </div>
+
+  <div class="footer">
+    <div class="copyright">
+      <p class="pull-left sm-pull-reset">
+        <span>Copyright <span class="copyright">©</span> 2021</span>
+        <span>Pemerintah</span>.
+      </p>
+    </div>
+  </div>
+</div>
+<!-- END PAGE CONTENT -->
+
+<% include ../../template-backoffice/footer.ejs %>
+
+    <!-- Plugins This Page -->
+   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.2/dist/leaflet.css" integrity="sha256-sA+zWATbFveLLNqWO2gtiw3HL/lh1giY/Inf1BJ0z14=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.2/dist/leaflet.js" integrity="sha256-o9N1jGDZrf5tS+Ft4gbIK7mYMipq9lqpVJ91xHSyKhg=" crossorigin=""></script>
+ 
+    
+<script >
+      var map = L.map('map', {
+    crs: L.CRS.Simple,
+    minZoom: -3
+});
+
+  window.onload = async () => {
+    let floor_plan =await $.get('/peta/floor_plan')
+    let data =await $.get('/peta/floor_plan?id=<%=id%>')
+        map.eachLayer((layer)=>{
+        layer.remove()
+    })
+     var bounds = [[0,0], [1000,1000]]; // Set the image resolution as the boundary
+     let i = 0
+    floor_plan.data.forEach(async (itm, idx)=>{
+      i++
+          let a =await $.get('/peta/floor_plan?peta=1&id='+itm.OGR_FID)
+    console.log(a);
+    let topojsonData  = JSON.parse(a)
+      const geojsonData = topojson.feature(topojsonData, topojsonData.objects.output);
+    console.log(geojsonData);
+
+        L.geoJSON(geojsonData, {
+            style: function (feature) {
+                return {
+                    color: 'purple',
+                    weight: 3,
+                    opacity: 0.65,
+                    fillColor: '#6a0dad',
+                    fillOpacity: 0.3
+                };
+            }
+        }).addTo(map);
+        if (i==floor_plan.data.length) {
+                  if (geojsonData.type === "FeatureCollection" && geojsonData.features.length > 0) {
+            const bounds = L.geoJSON(geojsonData).getBounds();
+            if (bounds.isValid()) {
+                map.fitBounds(bounds);
+            }
+        }
+        }
+    })
+
+
+        // if (geojsonData.type === "FeatureCollection" && geojsonData.features.length > 0) {
+        //     const bounds = L.geoJSON(geojsonData).getBounds();
+        //     if (bounds.isValid()) {
+        //         map.fitBounds(bounds);
+        //     }
+        // }
+    //  data.data.forEach((itm, idx)=>{
+    //   console.log(itm);
+      
+    //         L.circle([itm.shape_leng,itm.shape_area], {color: 'green',radius: 20}).addTo(map).on("click", (e)=>{
+    //           alert('hai')
+    //         })
+    //         .bindTooltip(('ok'), {permanent: true, direction: 'center'}).openTooltip();
+    //     })
+    //     map.fitBounds(bounds)
+        
+  }
+</script>
