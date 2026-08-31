@@ -23,7 +23,7 @@
             <thead>
               <tr>
                 <th class="header">No.</th>
-                <th class="header">Id</th>
+                <th class="header">Field 1</th>
                 <th class="header">Option</th>
               </tr>
             </thead>
@@ -31,7 +31,7 @@
             <tbody>
             <tr>
               <td>-</td>
-              <td>-</td>
+              <td>Value Field 1</td>
 
               <td>
                 <center>
@@ -80,24 +80,24 @@ let data_table=    $('#data').DataTable({
             "sLast":     "Terakhir"
           }
       },
-       "ajax":  `/peta/floor_plan`,
-           "columns": [
-               { "data": null},
-               { "data": "objectid"},
-               { "data": "objectid",render: function(data){
-                let a = ''
-                if (data) {
-                    a = `
-                <ul class="list-inline text-center mb-0">
-                  <li class="list-inline-item"><a href="/manajemen_basic/edit/${data}" class="btn btn-warning"><i class="fa fa-pencil-square-o"></i></a></li>
-                </ul>`
-                }
-                return `<td><center>${a}</center></td>`
-               }},
-         ],
-      "columnDefs": [
-          { "width": "100px", "targets": 1}
-      ],
+      //  "ajax":  `/peta/floor_plan`,
+        //    "columns": [
+        //        { "data": null},
+        //        { "data": "objectid"},
+        //        { "data": "objectid",render: function(data){
+        //         let a = ''
+        //         if (data) {
+        //             a = `
+        //         <ul class="list-inline text-center mb-0">
+        //           <li class="list-inline-item"><a href="/manajemen_basic/edit/${data}" class="btn btn-warning"><i class="fa fa-pencil-square-o"></i></a></li>
+        //         </ul>`
+        //         }
+        //         return `<td><center>${a}</center></td>`
+        //        }},
+        //  ],
+      // "columnDefs": [
+      //     { "width": "100px", "targets": 1}
+      // ],
     });
     data_table.on( 'draw.dt', function () {
     let PageInfo = $('#data').DataTable().page.info();
