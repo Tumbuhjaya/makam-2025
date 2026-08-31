@@ -1,16 +1,15 @@
+require('dotenv').config();
 
-/*
- * GET home page.
- */
-// import database
-require('dotenv').config()
+const mysql = require('mysql');
 
- var mysql      = require('mysql');
-
-module.exports.connection = mysql.createConnection({
-  host     : process.env.DB_HOST,
-  user     : process.env.DB_USER,
-  port	   : process.env.DB_PORT,
-  password : process.env.DB_PASSWORD,
-  database : process.env.DB_NAME
+const pool = mysql.createPool({
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    port: process.env.DB_PORT,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    connectionLimit: 100, 
+    waitForConnections: true,
+    queueLimit: 0
 });
+module.exports.connection = pool;

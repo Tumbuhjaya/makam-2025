@@ -1,3 +1,11 @@
-public
-node_modules
+# File metadata macOS
+.DS_Store
+._.DS_Store
+**/.DS_Store
+**/._.DS_Store
+
+node_modules/
+
 .env
+.env.local
+.env.production

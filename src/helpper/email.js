@@ -1,6 +1,7 @@
 const nodemailer = require('nodemailer')
 var connection = require('../database').connection;
 var sql_enak = require('../database/mysql_enak.js').connection;
+require('dotenv').config(); 
 
 const ejs = require('ejs');
 const path = require('path');
@@ -9,8 +10,8 @@ const email = function (email, subject, isi) {
     var transporter = nodemailer.createTransport({
         service: 'Gmail',
         auth: {
-         user: 'dsr010192@gmail.com',
-         pass: '***REMOVED***'
+           user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS
         }
         });
     var mainOptions = {
