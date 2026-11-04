@@ -5,6 +5,8 @@
 **/._.DS_Store
 
 node_modules/
+src/public/
+src/.env
 
 .env
 .env.local
