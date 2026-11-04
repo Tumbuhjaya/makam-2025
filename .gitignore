@@ -13,7 +13,7 @@ src/.env*
 
 # File upload user (simpan di object storage, bukan di Git)
 /public/foto/
-/src/public/
+src/public/
 public/uploads/
 
 # File sementara upload SHP
