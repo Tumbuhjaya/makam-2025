@@ -15,7 +15,7 @@ var dbgeo = require("dbgeo");
   router.use(bodyParser.urlencoded({ extended: true }));
   router.use(bodyParser.json());
   router.use(cookieParser() );
-  router.use(session({ secret: '***REMOVED***', cookie: { maxAge : 1200000 },saveUninitialized: true, resave: true }));
+  router.use(session({ secret: process.env.SESSION_SECRET, cookie: { maxAge : 1200000 },saveUninitialized: true, resave: true }));
   router.use(passport.initialize());
   router.use(passport.session());
   

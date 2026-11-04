@@ -46,14 +46,7 @@ router.use(function timeLog(req, res, next) {
   next();
 });
 
-var storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'public/foto/')
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now()+'-'+file.originalname)
-  }
-})
+var storage = require('../storage').storage;
 const fileFilter = (req, file, cb) => {
     // Cek tipe MIME. JPEG memiliki tipe 'image/jpeg'
     if (file.mimetype === 'image/jpeg'||file.mimetype === 'image/jpg'||file.mimetype === 'image/png') {

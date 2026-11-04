@@ -26,8 +26,8 @@ var nodemailer = require('nodemailer')
 var transporter = nodemailer.createTransport({
   service: 'Gmail',
   auth: {
-   user: 'makam.semarangkota@gmail.com',
-    pass: '***REMOVED***'
+   user: process.env.GMAIL_USER,
+    pass: process.env.GMAIL_APP_PASSWORD
   }
 });
   router.use(cookieParser() );
@@ -57,14 +57,7 @@ router.use(function timeLog(req, res, next) {
   next();
 });
 
-var storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'public/foto/')
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now()+'-'+file.originalname)
-  }
-})
+var storage = require('../storage').storage;
 
 var upload = multer({ storage: storage })
 function email(email,subject,isi) {

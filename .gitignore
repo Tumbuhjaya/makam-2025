@@ -1,13 +1,20 @@
 # File metadata macOS
 .DS_Store
-._.DS_Store
+._*
 **/.DS_Store
-**/._.DS_Store
+**/._*
 
 node_modules/
-src/public/
-src/.env
 
-.env
-.env.local
-.env.production
+# Environment / secrets (jangan pernah di-commit)
+.env*
+!.env.example
+src/.env*
+
+# File upload user (simpan di object storage, bukan di Git)
+/public/foto/
+/src/public/
+public/uploads/
+
+# File sementara upload SHP
+src/shp/datane.*

@@ -18,8 +18,8 @@ var express = require('express')
   let transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: 'noreply@survplus.id',
-      pass: '***REMOVED***'
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS
     }
   })
 var login = require('./isine/login').router;
@@ -98,7 +98,7 @@ app.use(cookieParser());
 app.use(session({
   duration: 50 * 60 * 1000,
   activeDuration: 10 * 60 * 1000,
-  secret: '***REMOVED***',
+  secret: process.env.SESSION_SECRET,
   cookie: { maxAge: 60 * 60 * 1000 },
   cookieName: 'session',
   saveUninitialized: true,

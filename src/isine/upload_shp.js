@@ -22,7 +22,7 @@ router.use(bodyParser.urlencoded({ extended: true }));
 router.use(bodyParser.json());
 router.use(cookieParser());
 router.use(session({ 
-    secret: '***REMOVED***',   // SARAN: pindahkan ke environment variable
+    secret: process.env.SESSION_SECRET,
     cookie: { maxAge: 1200000 },
     saveUninitialized: true,
     resave: true 

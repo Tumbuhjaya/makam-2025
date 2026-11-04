@@ -17,7 +17,7 @@ path.join(__dirname, '/foto')
   router.use(bodyParser.urlencoded({ extended: true }));
   router.use(bodyParser.json());
   router.use(cookieParser() );
-  router.use(session({ secret: '***REMOVED***', cookie: { maxAge : 1200000 },saveUninitialized: true, resave: true }));
+  router.use(session({ secret: process.env.SESSION_SECRET, cookie: { maxAge : 1200000 },saveUninitialized: true, resave: true }));
   router.use(passport.initialize());
   router.use(passport.session());
   
@@ -27,14 +27,7 @@ router.use(function timeLog(req, res, next) {
   next();
 });
 
-var storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'foto/')
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now()+'-'+file.originalname)
-  }
-})
+var storage = require('../storage').storage;
 
 var upload = multer({ storage: storage })
 router.get('/', cek_login, function(req, res) {

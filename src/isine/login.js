@@ -17,7 +17,7 @@ router.use(bodyParser.urlencoded({ extended: true }));
 router.use(bodyParser.json());
 router.use(cookieParser());
 router.use(session({ 
-    secret: '***REMOVED***',   // SARAN: pindahkan ke environment variable
+    secret: process.env.SESSION_SECRET,
     cookie: { maxAge: 1200000 },
     saveUninitialized: true,
     resave: true 
@@ -59,9 +59,9 @@ function(req, username, password, done) {
 
 // ========== Google Strategy ==========
 passport.use(new GoogleStrategy({
-    clientID: "1017151440022-7jkuiqa8t0eqpebbl85nktugmh8rqpvm.apps.googleusercontent.com",  // SARAN: pindahkan ke .env
-    clientSecret: "***REMOVED***",                                             // SARAN: pindahkan ke .env
-    callbackURL: "http://singmantap.jeparakab.go.id/autentifikasi/auth/google/callback"   // SARAN: pindahkan ke .env
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: process.env.GOOGLE_CALLBACK_URL
 },
 function(accessToken, refreshToken, profile, done) {
     // PERBAIKAN: parameterized query

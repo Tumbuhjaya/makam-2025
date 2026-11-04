@@ -15,13 +15,14 @@ var express = require('express')
   var axios = require('axios');
 const fs = require('fs');
 const FormData = require('form-data');
+var storage = require('./storage');
 
   var nodemailer = require('nodemailer')
   var transporter = nodemailer.createTransport({
     service: 'Gmail',
     auth: {
-     user: 'makam.semarangkota@gmail.com',
-     pass: '***REMOVED***'
+     user: process.env.GMAIL_USER,
+     pass: process.env.GMAIL_APP_PASSWORD
     }
   });
 var login = require('./isine/login').router;
@@ -125,6 +126,7 @@ function kirimWa(hp,text) {
 app.use(logger('dev'));
 app.use(methodOverride());
 // app.use(static(path.join(__dirname, 'public')));
+app.get('/foto/:key', storage.serve);
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -132,7 +134,7 @@ app.use(cookieParser());
 app.use(session({
   duration: 50 * 60 * 1000,
   activeDuration: 10 * 60 * 1000,
-  secret: '***REMOVED***',
+  secret: process.env.SESSION_SECRET,
   cookie: { maxAge: 60 * 60 * 1000 },
   cookieName: 'session',
   saveUninitialized: true,
@@ -177,16 +179,15 @@ app.use('/makam',  require('./isine/makam'));
 app.use('/log',  require('./isine/log'));
 app.get('/verify-tte', async (req, res) => {
   try {
-    const filePath = path.join(__dirname, '..', 'public', 'foto', 'hasil_tte3.pdf');
-    const fileBuffer = fs.readFileSync(filePath);
+    const fileBuffer = await storage.getFile('hasil_tte3.pdf');
     const base64File = fileBuffer.toString('base64');
 
-    const username = 'disperkim';
-    const password = '***REMOVED***';
+    const username = process.env.TTE_USERNAME;
+    const password = process.env.TTE_PASSWORD;
     const basicAuth = Buffer.from(`${username}:${password}`).toString('base64');
 
     const response = await axios.post(
-      'http://192.168.147.90/api/v2/verify/pdf',
+      process.env.TTE_BASE_URL + '/api/v2/verify/pdf',
       { file: base64File },
       {
         headers: {
@@ -215,21 +216,20 @@ app.get('/cetak-tte-inv', async (req, res) => {
   let { file } = req.body
   try {
     // 🔹 1. Read file PDF
-    const filePath = path.join(__dirname, '..', 'public','foto', file);
-    const fileBuffer = fs.readFileSync(filePath);
+    const fileBuffer = await storage.getFile(file);
     const base64File = fileBuffer.toString('base64');
 
     // 🔹 2. Config Esign
-    const username = 'disperkim';
-    const password = '***REMOVED***';
+    const username = process.env.TTE_USERNAME;
+    const password = process.env.TTE_PASSWORD;
     const basicAuth = Buffer.from(`${username}:${password}`).toString('base64');
 
     // 🔹 3. Request ke API TTE
     const response = await axios.post(
-      'http://192.168.147.90/api/v2/sign/pdf',
+      process.env.TTE_BASE_URL + '/api/v2/sign/pdf',
       {
-        nik: "1234567890123452",
-        passphrase: "***REMOVED***",
+        nik: process.env.TTE_NIK,
+        passphrase: process.env.TTE_PASSPHRASE,
         signatureProperties: [
           {
             tampilan: "INVISIBLE",
@@ -254,9 +254,7 @@ app.get('/cetak-tte-inv', async (req, res) => {
     const resultBase64 = response.data.file[0];
     // 🔹 5. Convert ke PDF
     // const outputPath = __dirname + '../public/hasil_tte.pdf';
-        const outputPath = path.join(__dirname, '..', 'public','foto', 'hasil_tte4.pdf');
-
-    fs.writeFileSync(outputPath, Buffer.from(resultBase64, 'base64'));
+    await storage.putFile('hasil_tte4.pdf', Buffer.from(resultBase64, 'base64'), 'application/pdf');
 
     return res.json({
       status: 'success',
@@ -279,25 +277,24 @@ app.post('/penandatangan', async (req, res) => {
 })
 app.post('/cetak-tte-qrcode', async (req, res) => {
   let {file,nik,passphrase} = req.body
-  console.log(file,nik,passphrase,req.body);
+  console.log(file, nik);
   if (file&&nik&&passphrase) {
     
   try {
     // 🔹 1. Path file (AMAN)
-    const filePath = path.join(__dirname, '..', 'public', 'foto', file);
-
-    if (!fs.existsSync(filePath)) {
+    file = path.basename(file);
+    if (!(await storage.exists(file))) {
       return res.status(400).json({
         status: 'error',
         message: 'File tidak ditemukan'
       });
     }
 
-    const fileBuffer = fs.readFileSync(filePath);
+    const fileBuffer = await storage.getFile(file);
 
     // 🔹 2. Config Basic Auth
-    const username = 'disperkim';
-    const password = '***REMOVED***';
+    const username = process.env.TTE_USERNAME;
+    const password = process.env.TTE_PASSWORD;
     const basicAuth = Buffer.from(`${username}:${password}`).toString('base64');
 
     // 🔹 3. FormData (FIXED VERSION)
@@ -306,14 +303,14 @@ app.post('/cetak-tte-qrcode', async (req, res) => {
     form.append('nik', nik);
     form.append('passphrase', passphrase);
     form.append('tampilan', 'visible');
-    form.append('linkQR', 'http://survplus.id:8918/foto/hasil_'+file);
+    form.append('linkQR', process.env.APP_PUBLIC_URL + '/foto/hasil_'+file);
     form.append('tag_koordinat', '#');
     form.append('width', '50');
     form.append('height', '50');
 
     // 🔹 4. Request ke API
     const response = await axios.post(
-      'http://192.168.147.90/api/sign/pdf',
+      process.env.TTE_BASE_URL + '/api/sign/pdf',
       form,
       {
         headers: {
@@ -325,11 +322,8 @@ app.post('/cetak-tte-qrcode', async (req, res) => {
     );
 
     // 🔹 5. Simpan hasil PDF
-    const outputPath = path.join(__dirname, '..', 'public', 'foto', 'hasil_'+file);
-    await sql_enak.raw(`UPDATE dokument
-SET sk = '${'hasil_'+file}'
-WHERE sk='${file}';`)
-    fs.writeFileSync(outputPath, response.data);
+    await storage.putFile('hasil_'+file, Buffer.from(response.data), 'application/pdf');
+    await sql_enak.raw(`UPDATE dokument SET sk = ? WHERE sk = ?`, ['hasil_'+file, file]);
 
     return res.json({
       status: 'success',
@@ -354,25 +348,24 @@ WHERE sk='${file}';`)
 });
 app.post('/cetak-tte-qrcode-p', async (req, res) => {
   let {file,nik,passphrase} = req.body
-  console.log(file,nik,passphrase,req.body);
+  console.log(file, nik);
   if (file&&nik&&passphrase) {
     
   try {
     // 🔹 1. Path file (AMAN)
-    const filePath = path.join(__dirname, '..', 'public', 'foto', file);
-
-    if (!fs.existsSync(filePath)) {
+    file = path.basename(file);
+    if (!(await storage.exists(file))) {
       return res.status(400).json({
         status: 'error',
         message: 'File tidak ditemukan'
       });
     }
 
-    const fileBuffer = fs.readFileSync(filePath);
+    const fileBuffer = await storage.getFile(file);
 
     // 🔹 2. Config Basic Auth
-    const username = 'disperkim';
-    const password = '***REMOVED***';
+    const username = process.env.TTE_USERNAME;
+    const password = process.env.TTE_PASSWORD;
     const basicAuth = Buffer.from(`${username}:${password}`).toString('base64');
 
     // 🔹 3. FormData (FIXED VERSION)
@@ -381,14 +374,14 @@ app.post('/cetak-tte-qrcode-p', async (req, res) => {
     form.append('nik', nik);
     form.append('passphrase', passphrase);
     form.append('tampilan', 'visible');
-    form.append('linkQR', 'http://survplus.id:8918/foto/hasil_'+file);
+    form.append('linkQR', process.env.APP_PUBLIC_URL + '/foto/hasil_'+file);
     form.append('tag_koordinat', '#');
     form.append('width', '50');
     form.append('height', '50');
 
     // 🔹 4. Request ke API
     const response = await axios.post(
-      'http://192.168.147.90/api/sign/pdf',
+      process.env.TTE_BASE_URL + '/api/sign/pdf',
       form,
       {
         headers: {
@@ -400,11 +393,8 @@ app.post('/cetak-tte-qrcode-p', async (req, res) => {
     );
 
     // 🔹 5. Simpan hasil PDF
-    const outputPath = path.join(__dirname, '..', 'public', 'foto', 'hasil_'+file);
-    await sql_enak.raw(`UPDATE perpanjangan
-SET sk_perpanjangan = '${'hasil_'+file}'
-WHERE sk_perpanjangan='${file}';`)
-    fs.writeFileSync(outputPath, response.data);
+    await storage.putFile('hasil_'+file, Buffer.from(response.data), 'application/pdf');
+    await sql_enak.raw(`UPDATE perpanjangan SET sk_perpanjangan = ? WHERE sk_perpanjangan = ?`, ['hasil_'+file, file]);
 
     return res.json({
       status: 'success',
