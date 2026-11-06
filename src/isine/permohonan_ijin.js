@@ -274,9 +274,9 @@ router.get('/',async function(req, res) {
   
 //  res.send(hasil) 
 // getIdBilling()
-// const lokasi = await sql_enak.raw(`SELECT DISTINCT nama_tpu as nama_tpu, (select x(centroid(SHAPE)) from makam where nama_tpu=nama_tpu limit 1 ) as x, (select y(centroid(SHAPE)) from makam where nama_tpu=nama_tpu limit 1 ) as y FROM makam m where m.deleted = 0`)
+// const lokasi = await sql_enak.raw(`SELECT DISTINCT nama_tpu as nama_tpu, (select ST_X(ST_Centroid(ST_SRID(SHAPE, 0))) from makam where nama_tpu=nama_tpu limit 1 ) as x, (select ST_Y(ST_Centroid(ST_SRID(SHAPE, 0))) from makam where nama_tpu=nama_tpu limit 1 ) as y FROM makam m where m.deleted = 0`)
   connection.query("SELECT id_kecamatan, kecamatan from kecamatan",async function (err, rows, fields) {
-  const lokasi = await sql_enak.raw(`SELECT mm.nama_tpu, (select x(centroid(SHAPE)) from makam where mm.id =master_makam_id  limit 1 ) as x, (select y(centroid(SHAPE)) from makam where mm.id =master_makam_id  limit 1 ) as y FROM master_makam mm  where mm.deleted = 0`)
+  const lokasi = await sql_enak.raw(`SELECT mm.nama_tpu, (select ST_X(ST_Centroid(ST_SRID(SHAPE, 0))) from makam where mm.id =master_makam_id  limit 1 ) as x, (select ST_Y(ST_Centroid(ST_SRID(SHAPE, 0))) from makam where mm.id =master_makam_id  limit 1 ) as y FROM master_makam mm  where mm.deleted = 0`)
   var captcha = svgCaptcha.create();
   var data = [captcha.data].join('\n')
   res.render('content/permohonan_ijin', {kec:rows,lokasi:lokasi[0],captcha,data}); 
@@ -295,7 +295,7 @@ router.get('/',async function(req, res) {
       rows[u].x = ''; 
       rows[u].y = '';
       console.log(rows[u].master_makam_id);
-      connection.query(`SELECT  x(centroid(SHAPE)) as x, y(centroid(SHAPE)) as y FROM makam m WHERE m.master_makam_id = '${rows[u].master_makam_id}' limit 1 `, function (err, det) {
+      connection.query(`SELECT  ST_X(ST_Centroid(ST_SRID(SHAPE, 0))) as x, ST_Y(ST_Centroid(ST_SRID(SHAPE, 0))) as y FROM makam m WHERE m.master_makam_id = '${rows[u].master_makam_id}' limit 1 `, function (err, det) {
         console.log(rows[u].master_makam_id);
         console.log(det);
         rows[u].x = det[0].x; 
@@ -460,7 +460,7 @@ INNER JOIN perpanjangan p ON d.id = p.dokument_id
 
   // }
   
-  let q = `SELECT distinct m.no_liang  as no_liang , m.id,  x(centroid(SHAPE)) as x, y(centroid(SHAPE)) as y  FROM makam m ${join} WHERE m.deleted = 0 and m.jns_makam !=2  ${w}  ORDER BY 
+  let q = `SELECT distinct m.no_liang  as no_liang , m.id,  ST_X(ST_Centroid(ST_SRID(SHAPE, 0))) as x, ST_Y(ST_Centroid(ST_SRID(SHAPE, 0))) as y  FROM makam m ${join} WHERE m.deleted = 0 and m.jns_makam !=2  ${w}  ORDER BY 
     CAST(m.no_liang AS UNSIGNED) ASC, 
     m.no_liang ASC;`
      console.log(q);

@@ -116,7 +116,7 @@ router.post('/shp', cpUpload, async function(req, res) {
                     SHAPE, kecamatan, nama_tpu, blok, sub_blok, no_liang,
                     id_kec, agama, keterangan, master_makam_id
                 ) VALUES (
-                    geomfromtext(?), ?, ?, ?, ?, ?, ?, ?, ?, ?
+                    ST_GeomFromText(?), ?, ?, ?, ?, ?, ?, ?, ?, ?
                 ) ON DUPLICATE KEY UPDATE
                     kecamatan = VALUES(kecamatan),
                     nama_tpu = VALUES(nama_tpu),

@@ -76,7 +76,7 @@ var context = getContext('2d', {
 })
 router.get('/',async function(req, res) {
   connection.query("SELECT id_kecamatan, kecamatan from kecamatan",async function (err, rows, fields) {
-    const lokasi = await sql_enak.raw(`SELECT mm.nama_tpu, (select x(centroid(SHAPE)) from makam where mm.id =master_makam_id  limit 1 ) as x, (select y(centroid(SHAPE)) from makam where mm.id =master_makam_id  limit 1 ) as y FROM master_makam mm  where mm.deleted = 0`)
+    const lokasi = await sql_enak.raw(`SELECT mm.nama_tpu, (select ST_X(ST_Centroid(ST_SRID(SHAPE, 0))) from makam where mm.id =master_makam_id  limit 1 ) as x, (select ST_Y(ST_Centroid(ST_SRID(SHAPE, 0))) from makam where mm.id =master_makam_id  limit 1 ) as y FROM master_makam mm  where mm.deleted = 0`)
     var captcha = svgCaptcha.create();
     var data = [captcha.data].join('\n')
     res.render('content/permohonan_bergota', {kec:rows,lokasi:lokasi[0],captcha,data}); 
@@ -98,7 +98,7 @@ router.get('/getKec',async function(req, res) {
 //       rows[u].x = ''; 
 //       rows[u].y = '';
 //       console.log(rows[u].master_makam_id);
-//       connection.query(`SELECT  x(centroid(SHAPE)) as x, y(centroid(SHAPE)) as y FROM makam m WHERE  m.master_makam_id in ((select id from master_makam m where m.deleted = 0 and m.kategori_tpu = 1)) and m.master_makam_id = '${rows[u].master_makam_id}'  and m.deleted = 0 `, function (err, det) {
+//       connection.query(`SELECT  ST_X(ST_Centroid(ST_SRID(SHAPE, 0))) as x, ST_Y(ST_Centroid(ST_SRID(SHAPE, 0))) as y FROM makam m WHERE  m.master_makam_id in ((select id from master_makam m where m.deleted = 0 and m.kategori_tpu = 1)) and m.master_makam_id = '${rows[u].master_makam_id}'  and m.deleted = 0 `, function (err, det) {
 //         console.log(rows[u].master_makam_id);
 //         console.log(det);
 //         for (let i = 0; i < det.length; i++) {
@@ -122,8 +122,8 @@ router.get('/lokasiByKec', function(req, res) {
         SELECT 
             mm.id as master_makam_id, 
             mm.nama_tpu,
-            (SELECT X(CENTROID(m.SHAPE)) FROM makam m WHERE m.master_makam_id = mm.id AND m.deleted = 0 LIMIT 1) as x,
-            (SELECT Y(CENTROID(m.SHAPE)) FROM makam m WHERE m.master_makam_id = mm.id AND m.deleted = 0 LIMIT 1) as y
+            (SELECT ST_X(ST_Centroid(ST_SRID(m.SHAPE, 0))) FROM makam m WHERE m.master_makam_id = mm.id AND m.deleted = 0 LIMIT 1) as x,
+            (SELECT ST_Y(ST_Centroid(ST_SRID(m.SHAPE, 0))) FROM makam m WHERE m.master_makam_id = mm.id AND m.deleted = 0 LIMIT 1) as y
         FROM master_makam mm
         WHERE mm.deleted = 0 
         AND mm.kategori_tpu = 1
@@ -183,7 +183,7 @@ router.get('/get_jenazah_by_sub_blok',async function(req, res) {
 
   // }
   
-  let q = `SELECT  j.nama_jenazah , mt.id,  x(centroid(SHAPE)) as x, y(centroid(SHAPE)) as y 
+  let q = `SELECT  j.nama_jenazah , mt.id,  ST_X(ST_Centroid(ST_SRID(SHAPE, 0))) as x, ST_Y(ST_Centroid(ST_SRID(SHAPE, 0))) as y 
 FROM makam m left JOIN  makam_tambahan mt on mt.makam_id = m.id 
 left join (SELECT max(j.tanggal_meninggal ) as tanggal_meninggal,j.id,j.makam_id   from jenazah j where j.kategori_tpu =1 GROUP by j.makam_id ) as j2 on j2.makam_id = mt.id
 left join jenazah j on j.id = j2.id 
@@ -255,7 +255,7 @@ INNER JOIN perpanjangan p ON d.id = p.dokument_id`
 
             }
             
-                 // connection.query("SELECT asWkb(a.SHAPE) as geometry, a.blok,j.nama_jenazah ,DATE_FORMAT(j.tanggal_meninggal , '%d-%m-%Y') as tanggal_meninggal , a.no_liang, a.keterangan, a.sub_blok, a.id, j.id as jenazahId FROM makam a left join jenazah j on a.id = j.makam_id and j.deleted = 0 "+a , function(err, rows, fields) {
+                 // connection.query("SELECT ST_AsWKB(ST_SRID(a.SHAPE, 0)) as geometry, a.blok,j.nama_jenazah ,DATE_FORMAT(j.tanggal_meninggal , '%d-%m-%Y') as tanggal_meninggal , a.no_liang, a.keterangan, a.sub_blok, a.id, j.id as jenazahId FROM makam a left join jenazah j on a.id = j.makam_id and j.deleted = 0 "+a , function(err, rows, fields) {
            let q = `SELECT
     j.*,
     DATE_FORMAT(j.tanggal_meninggal , '%Y-%m-%d') AS tanggal_meninggal,

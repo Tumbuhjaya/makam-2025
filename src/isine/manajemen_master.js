@@ -64,7 +64,7 @@ router.get('/digitasi_liang', cek_login,async function(req, res) {
 // });
 
 router.get('/digitasi_liang/edit/:id', cek_login,async function(req, res) {
-//   let data = await sql_enak.raw(`SELECT id, x(centroid(SHAPE)) as x, y(centroid(SHAPE)) as y, blok, sub_blok, no_liang ,     COALESCE(jml_jenazah, 0) AS jml_jenazah
+//   let data = await sql_enak.raw(`SELECT id, ST_X(ST_Centroid(ST_SRID(SHAPE, 0))) as x, ST_Y(ST_Centroid(ST_SRID(SHAPE, 0))) as y, blok, sub_blok, no_liang ,     COALESCE(jml_jenazah, 0) AS jml_jenazah
 //  FROM makam m left join (select count(*) as jml_jenazah ,j.makam_id    from jenazah j where j.deleted = 0 group by j.makam_id  ) as a on
 // a.makam_id = m.id WHERE m.master_makam_id ='${req.params.id}' and  m.deleted = 0  ORDER BY blok asc, sub_blok asc, no_liang asc`)
   let agama = await sql_enak.raw(`SELECT DISTINCT  m.agama  as agama FROM makam m WHERE m.deleted = 0  and m.master_makam_id = '${req.params.id}'`)
@@ -106,7 +106,7 @@ router.post('/digitasi_liang',cek_login,async function(req, res) {
       value.push(`%${cari}%`)
       value.push(`%${cari}%`)
   }
-  let sql = ` id, x(centroid(SHAPE)) as x, y(centroid(SHAPE)) as y, blok, sub_blok, no_liang ,  keterangan_pengelola,   COALESCE(jml_jenazah, 0) AS jml_jenazah `
+  let sql = ` id, ST_X(ST_Centroid(ST_SRID(SHAPE, 0))) as x, ST_Y(ST_Centroid(ST_SRID(SHAPE, 0))) as y, blok, sub_blok, no_liang ,  keterangan_pengelola,   COALESCE(jml_jenazah, 0) AS jml_jenazah `
   if (count) {
     sql = ' count(*) as jml'
   }
@@ -206,7 +206,7 @@ router.post(`/submit_insert_makam`,cek_login,async function (req,res) {
   
   if(req.body.SHAPE){
 
-    post['SHAPE']= st.geomFromText(req.body.SHAPE, 4326);
+    post['SHAPE']= sql_enak.raw("ST_GeomFromText(?, 4326, 'axis-order=long-lat')", [req.body.SHAPE]);
   }
 if (jenazah_id||nama_jenazah) {
   post.status_makam =2
@@ -305,7 +305,7 @@ left join master_makam mm on mm.id = j.tpu  WHERE j.deleted = 0  and p.deleted =
   const lokasi = await sql_enak.raw(`SELECT * FROM master_makam mm  WHERE mm.deleted = 0  and mm.id = ${data[0][0].tpu} `)
   const blok = await sql_enak.raw(`SELECT DISTINCT  m.blok  as blok FROM makam m WHERE m.deleted = 0    and m.nama_tpu = '${data[0][0].nama_tpu}'`)
   const sub_blok = await sql_enak.raw(`SELECT m.id,m.sub_blok as subblok FROM makam m WHERE m.deleted = 0 and m.nama_tpu = '${data[0][0].nama_tpu}'  and m.blok =   '${data[0][0].blok}' `)
-  const no_liang = await sql_enak.raw(`SELECT  j.nama_jenazah , mt.id,  x(centroid(SHAPE)) as x, y(centroid(SHAPE)) as y 
+  const no_liang = await sql_enak.raw(`SELECT  j.nama_jenazah , mt.id,  ST_X(ST_Centroid(ST_SRID(SHAPE, 0))) as x, ST_Y(ST_Centroid(ST_SRID(SHAPE, 0))) as y 
 FROM makam m left JOIN  makam_tambahan mt on mt.makam_id = m.id 
 left join (SELECT max(j.tanggal_meninggal ) as tanggal_meninggal,j.id,j.makam_id   from jenazah j where j.kategori_tpu =1 GROUP by j.makam_id ) as j2 on j2.makam_id = mt.id
 left join jenazah j on j.id = j2.id 

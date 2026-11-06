@@ -486,8 +486,8 @@ app.post('/get_nama_dan_lokasi',async function (req,res) {
     j.id as jenazah_id, 
     j.nama_jenazah as nama_jenazah, 
     IF(j.kategori_tpu = 1, m2.id, m.id) as makam_id,
-    IF(j.kategori_tpu = 1, x(centroid(m2.SHAPE)), x(centroid(m.SHAPE))) as x,
-    IF(j.kategori_tpu = 1, y(centroid(m2.SHAPE)), y(centroid(m.SHAPE))) as y
+    IF(j.kategori_tpu = 1, ST_X(ST_Centroid(ST_SRID(m2.SHAPE, 0))), ST_X(ST_Centroid(ST_SRID(m.SHAPE, 0)))) as x,
+    IF(j.kategori_tpu = 1, ST_Y(ST_Centroid(ST_SRID(m2.SHAPE, 0))), ST_Y(ST_Centroid(ST_SRID(m.SHAPE, 0)))) as y
 FROM (
     SELECT * FROM (
         SELECT max(p.id) as idx 
@@ -519,7 +519,7 @@ app.get('/',async function (req, res) {
 console.log(luas[0],'ini luas');
 
   connection.query("SELECT id_kecamatan, kecamatan from kecamatan",async function (err, kec, fields) {
-    connection.query(`SELECT  nama_tpu,id, (select x(centroid(SHAPE)) from makam where master_makam_id =mm.id limit 1 ) as x, (select y(centroid(SHAPE)) from makam where master_makam_id=mm.id limit 1 ) as y FROM master_makam mm  where mm.deleted = 0  GROUP by nama_tpu`,async function (err, makam , fields) {
+    connection.query(`SELECT  nama_tpu,id, (select ST_X(ST_Centroid(ST_SRID(SHAPE, 0))) from makam where master_makam_id =mm.id limit 1 ) as x, (select ST_Y(ST_Centroid(ST_SRID(SHAPE, 0))) from makam where master_makam_id=mm.id limit 1 ) as y FROM master_makam mm  where mm.deleted = 0  GROUP by nama_tpu`,async function (err, makam , fields) {
       connection.query("SELECT id_kecamatan, kecamatan from kecamatan",async function (err, kecamatan, fields) {
         connection.query(`SELECT COUNT(*) as total  FROM makam m WHERE  m.jumlah_jenazah  =0  and m.deleted = 0`,async function (err, liang_kosong, fields) {
             connection.query(`SELECT COUNT(*) as total  FROM makam m WHERE  m.jumlah_jenazah  >0   and m.deleted = 0`,async function (err, liang_isi, fields) {
@@ -1353,7 +1353,7 @@ app.get(`/getMakamByTgl`,function (req,res) {
   if (req.query.tanggal) {
     w+=` and j.tanggal_meninggal = (SELECT DATE_FORMAT('${req.query.tanggal}','%Y-%m-%d'))`
   }
-  connection.query(`SELECT  nama_tpu,id, (select x(centroid(SHAPE)) from makam where master_makam_id =mm.id limit 1 ) as x, (select y(centroid(SHAPE)) from makam where master_makam_id=mm.id limit 1 ) as y FROM master_makam mm  where mm.deleted = 0 ${w} GROUP by nama_tpu`,async function (err, makam , fields) {
+  connection.query(`SELECT  nama_tpu,id, (select ST_X(ST_Centroid(ST_SRID(SHAPE, 0))) from makam where master_makam_id =mm.id limit 1 ) as x, (select ST_Y(ST_Centroid(ST_SRID(SHAPE, 0))) from makam where master_makam_id=mm.id limit 1 ) as y FROM master_makam mm  where mm.deleted = 0 ${w} GROUP by nama_tpu`,async function (err, makam , fields) {
   })
 })
 app.get(`/getMasterMakam`,async function (req,res) {

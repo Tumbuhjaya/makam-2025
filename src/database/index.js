@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-const mysql = require('mysql');
+const mysql = require('mysql2');
 
 const pool = mysql.createPool({
     host: process.env.DB_HOST,
@@ -11,5 +11,10 @@ const pool = mysql.createPool({
     connectionLimit: 100, 
     waitForConnections: true,
     queueLimit: 0
+});
+// Samakan perilaku dengan server 5.7 lama (sql_mode kosong): query lama memakai
+// GROUP BY tidak lengkap & tanggal 0000-00-00 yang ditolak sql_mode default MySQL 8
+pool.on('connection', function (conn) {
+    conn.query('SET SESSION sql_mode = ?', [process.env.DB_SQL_MODE || '']);
 });
 module.exports.connection = pool;

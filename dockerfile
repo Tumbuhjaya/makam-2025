@@ -1,4 +1,7 @@
-FROM keymetrics/pm2:latest-alpine
+FROM node:22-alpine
+
+# Build tools for native modules (deasync) and the pm2 runtime
+RUN apk add --no-cache python3 make g++ && npm install -g pm2
 
 # Bundle APP files
 COPY src src/
