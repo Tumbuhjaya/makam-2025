@@ -52,9 +52,9 @@ var upload = multer({ storage: storage })
 
 //start-------------------------------------
 router.get('/', cek_login,async function(req, res) {
-  console.log(`SELECT DISTINCT  u.master_makam_id , u.id_user , k.kecamatan , m.nama_tpu  FROM user u left join master_makam m on m.id  = u.master_makam_id  LEFT JOIN kecamatan k on m.id_kec = k.id_kecamatan  WHERE m.id = ${req.user[0].master_makam_id}`);
+  console.log(`SELECT DISTINCT  u.master_makam_id , m.mmuuid , u.id_user , k.kecamatan , m.nama_tpu  FROM user u left join master_makam m on m.id  = u.master_makam_id  LEFT JOIN kecamatan k on m.id_kec = k.id_kecamatan  WHERE m.id = ${req.user[0].master_makam_id}`);
   
-  let data = await sql_enak.raw(`SELECT DISTINCT  u.master_makam_id , u.id_user , k.kecamatan , m.nama_tpu  FROM user u left join master_makam m on m.id  = u.master_makam_id  LEFT JOIN kecamatan k on m.id_kec = k.id_kecamatan  WHERE m.id = ${req.user[0].master_makam_id}`)
+  let data = await sql_enak.raw(`SELECT DISTINCT  u.master_makam_id , m.mmuuid , u.id_user , k.kecamatan , m.nama_tpu  FROM user u left join master_makam m on m.id  = u.master_makam_id  LEFT JOIN kecamatan k on m.id_kec = k.id_kecamatan  WHERE m.id = ${req.user[0].master_makam_id}`)
   res.render('content-backoffice/manajemen_sinkronisasi_data/list',{data:data[0]}); 
 });
 
@@ -66,11 +66,14 @@ router.get('/edit/:id', cek_login,async function(req, res) {
 //   let data = await sql_enak.raw(`SELECT id, ST_X(ST_Centroid(ST_SRID(SHAPE, 0))) as x, ST_Y(ST_Centroid(ST_SRID(SHAPE, 0))) as y, blok, sub_blok, no_liang ,     COALESCE(jml_jenazah, 0) AS jml_jenazah
 //  FROM makam m left join (select count(*) as jml_jenazah ,j.makam_id    from jenazah j where j.deleted = 0 group by j.makam_id  ) as a on
 // a.makam_id = m.id WHERE m.master_makam_id ='${req.params.id}' and  m.deleted = 0  ORDER BY blok asc, sub_blok asc, no_liang asc`)
-  let blok = await sql_enak.raw(`SELECT DISTINCT  m.blok  as blok FROM makam m WHERE m.deleted = 0  and m.mmuuid = '${req.params.id}'`)
-  let master_makam = await sql_enak.raw(`SELECT * FROM master_makam m WHERE m.deleted = 0  and m.muuid = '${req.params.id}'`)
-  console.log(master_makam);
+  let master_makam = await sql_enak.raw(`SELECT * FROM master_makam m WHERE m.deleted = 0  and m.mmuuid = ?`, [req.params.id])
+  if (!master_makam[0].length) {
+    return res.status(404).send('Data master makam tidak ditemukan')
+  }
+  let master_makam_id = master_makam[0][0].id
+  let blok = await sql_enak.raw(`SELECT DISTINCT  m.blok  as blok FROM makam m WHERE m.deleted = 0  and m.master_makam_id = ?`, [master_makam_id])
   // , makam:data[0]
-  res.render('content-backoffice/manajemen_sinkronisasi_data/edit',{nama_makam:req.params.id,blok:blok[0], master_makam:master_makam[0]}); 
+  res.render('content-backoffice/manajemen_sinkronisasi_data/edit',{nama_makam:master_makam_id,blok:blok[0], master_makam:master_makam[0]}); 
 });
 
 router.post('/',cek_login,async function(req, res) {

@@ -1140,44 +1140,103 @@ $("#parsepeta").on("click", function () {
                 marker: false
             },
             edit: {
-                featureGroup: drawnItems, //REQUIRED!! 
+                featureGroup: drawnItems, //REQUIRED!!
+                edit: false, // vertex tidak boleh diedit supaya ukuran tetap 1x2 m (geser pakai titik tengah)
                 remove: true
             }
         };
 
         var drawControl = new L.Control.Draw(options);
-         map.addControl(drawControl); 
+         map.addControl(drawControl);
+
+        // liang 1 x 2 meter yang bisa diputar & digeser
+        var LIANG_LEBAR = 1, LIANG_PANJANG = 2 // meter
+        var liang = { center: null, sudut: 0, layer: null, marker: null }
+
+        // sudut = derajat searah jarum jam dari utara, sisi panjang (2 m) mengikuti sudut
+        function kotakLiang(center, sudut) {
+            var rad = sudut * Math.PI / 180
+            var mLat = 111320
+            var mLng = 111320 * Math.cos(center.lat * Math.PI / 180)
+            var w = LIANG_LEBAR / 2, h = LIANG_PANJANG / 2
+            return [[-w, -h], [w, -h], [w, h], [-w, h]].map(function (p) {
+                var x = p[0] * Math.cos(rad) + p[1] * Math.sin(rad)
+                var y = -p[0] * Math.sin(rad) + p[1] * Math.cos(rad)
+                return L.latLng(center.lat + y / mLat, center.lng + x / mLng)
+            })
+        }
+
+        function gambarLiang() {
+            if (!liang.center) return
+            var titik = kotakLiang(liang.center, liang.sudut)
+            if (liang.layer) {
+                liang.layer.setLatLngs(titik)
+            } else {
+                liang.layer = L.polygon(titik, { color: '#bada55' })
+                drawnItems.addLayer(liang.layer)
+            }
+            if (!liang.marker) {
+                liang.marker = L.marker(liang.center, { draggable: true, title: 'Geser liang' }).addTo(map)
+                liang.marker.on('drag', function (e) {
+                    liang.center = e.target.getLatLng()
+                    gambarLiang()
+                })
+            }
+            $('#SHAPE').val(toWKT(liang.layer))
+            $('#liang_sudut, #liang_sudut_range').val(liang.sudut)
+        }
+
+        function hapusLiang() {
+            if (liang.marker) map.removeLayer(liang.marker)
+            liang = { center: null, sudut: liang.sudut, layer: null, marker: null }
+            $('#SHAPE').val('')
+        }
+
+        function setSudut(nilai) {
+            nilai = parseFloat(nilai)
+            if (isNaN(nilai)) return
+            liang.sudut = ((nilai % 360) + 360) % 360
+            gambarLiang()
+        }
+
+        var kontrolLiang = L.control({ position: 'topright' })
+        kontrolLiang.onAdd = function () {
+            var div = L.DomUtil.create('div', 'leaflet-bar')
+            div.style.background = '#fff'
+            div.style.padding = '8px'
+            div.style.width = '220px'
+            div.innerHTML =
+                '<b>Liang ' + LIANG_LEBAR + ' x ' + LIANG_PANJANG + ' m</b><br/>' +
+                '<small>Gambar kotak/polygon untuk menaruh liang, geser lewat titik tengah.</small>' +
+                '<div style="margin-top:6px">Rotasi (&deg;)</div>' +
+                '<input type="range" id="liang_sudut_range" min="0" max="359" step="1" value="0" style="width:100%"/>' +
+                '<div style="display:flex;gap:4px;margin-top:4px">' +
+                '<button type="button" class="btn btn-default btn-sm" id="liang_kiri" style="margin:0">&#8634; 5</button>' +
+                '<input type="number" id="liang_sudut" min="0" max="359" step="0.5" value="0" class="form-control input-sm" style="width:70px"/>' +
+                '<button type="button" class="btn btn-default btn-sm" id="liang_kanan" style="margin:0">&#8635; 5</button>' +
+                '</div>' +
+                '<input type="hidden" id="SHAPE" name="SHAPE"/>'
+            L.DomEvent.disableClickPropagation(div)
+            L.DomEvent.disableScrollPropagation(div)
+            return div
+        }
+        kontrolLiang.addTo(map)
+
+        $(document).on('input change', '#liang_sudut_range, #liang_sudut', function () { setSudut($(this).val()) })
+        $(document).on('click', '#liang_kiri', function () { setSudut(liang.sudut - 5) })
+        $(document).on('click', '#liang_kanan', function () { setSudut(liang.sudut + 5) })
 
         map.on(L.Draw.Event.CREATED, function (event) {
             drawnItems.clearLayers();
-            var layer = event.layer;
-            var latlngss = layer.getLatLngs();
-            // console.log(latlngss[0]) 
-            var seeArea = L.GeometryUtil.geodesicArea(latlngss[0]);
-            seeArea = L.GeometryUtil.readableArea(seeArea, true, {})
-            // console.log(seeArea); 
-            // console.log(toWKT(layer)); 
-            // console.log(layer); 
+            hapusLiang()
+            // posisi liang = titik tengah gambar, ukuran dipaksa 1 x 2 m
+            liang.center = event.layer.getBounds().getCenter()
+            gambarLiang()
+            map.setView(liang.center, Math.max(map.getZoom(), 21))
+        });
 
-
-
-
-            //    html = html+"</br>"+"<a href='/peta/print?p="+toWKT(layer)+"' style='color:blue' target='_blank'>[DOWNLOAD]</a>"; 
-            var bounds = layer.getBounds();
-            //         // Get center of bounds 
-            var center = bounds.getCenter();
-            // map.openPopup(html, center, { 
-            //     offset: L.point(0, -24) 
-            //   }); 
-            //  $('#konten_polaruang').empty() 
-            // $('#konten_polaruang').append(html) 
-
-            // // $("#konten-detail").toggle("slide", {direction:"right"}, 500); 
-            // $('.modal').modal('show'); 
-            //  drawnItems.addLayer(layer); 
-            peta_pemohon(toWKT(layer))
-
-
+        map.on(L.Draw.Event.DELETED, function () {
+            hapusLiang()
         });
 
 
