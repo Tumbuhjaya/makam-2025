@@ -1,5 +1,10 @@
 <% include ../../template-backoffice/header.ejs %>
 <style>
+/* liang bisa digeser dengan ditarik */
+path.liang-geser.leaflet-interactive {
+  cursor: move;
+}
+
 /* Style untuk tab */
 .tab {
   overflow: hidden;
@@ -491,7 +496,8 @@
 
 // Tambahkan kode ini untuk memastikan tab pertama terbuka secara default
 document.addEventListener("DOMContentLoaded", function() {
-    document.querySelector(".tablinks").click();
+    var tabPertama = document.querySelector(".tablinks");
+    if (tabPertama) tabPertama.click();
 });
     let tumpang = 0
     let rooturl  = ''
@@ -1172,7 +1178,8 @@ $("#parsepeta").on("click", function () {
             if (liang.layer) {
                 liang.layer.setLatLngs(titik)
             } else {
-                liang.layer = L.polygon(titik, { color: '#bada55' })
+                liang.layer = L.polygon(titik, { color: '#bada55', className: 'liang-geser' })
+                liang.layer.on('mousedown touchstart', mulaiGeserLiang)
                 drawnItems.addLayer(liang.layer)
             }
             if (!liang.marker) {
@@ -1184,6 +1191,35 @@ $("#parsepeta").on("click", function () {
             }
             $('#SHAPE').val(toWKT(liang.layer))
             $('#liang_sudut, #liang_sudut_range').val(liang.sudut)
+        }
+
+        // geser liang dengan menarik shape-nya langsung
+        var sedangMenggambar = false
+        map.on('draw:drawstart draw:editstart draw:deletestart', function () { sedangMenggambar = true })
+        map.on('draw:drawstop draw:editstop draw:deletestop', function () { sedangMenggambar = false })
+
+        function mulaiGeserLiang(e) {
+            if (sedangMenggambar || !liang.center) return
+            L.DomEvent.stop(e)
+            var awal = e.latlng, pusatAwal = liang.center
+            var mapBisaDigeser = map.dragging.enabled()
+            map.dragging.disable()
+
+            function geser(ev) {
+                var t = ev.touches && ev.touches.length ? ev.touches[0] : ev
+                var posisi = map.mouseEventToLatLng(t)
+                liang.center = L.latLng(pusatAwal.lat + posisi.lat - awal.lat, pusatAwal.lng + posisi.lng - awal.lng)
+                liang.marker.setLatLng(liang.center)
+                gambarLiang()
+                L.DomEvent.preventDefault(ev)
+            }
+            function selesai() {
+                L.DomEvent.off(document, 'mousemove touchmove', geser)
+                L.DomEvent.off(document, 'mouseup touchend', selesai)
+                if (mapBisaDigeser) map.dragging.enable()
+            }
+            L.DomEvent.on(document, 'mousemove touchmove', geser)
+            L.DomEvent.on(document, 'mouseup touchend', selesai)
         }
 
         function hapusLiang() {
@@ -1207,7 +1243,7 @@ $("#parsepeta").on("click", function () {
             div.style.width = '220px'
             div.innerHTML =
                 '<b>Liang ' + LIANG_LEBAR + ' x ' + LIANG_PANJANG + ' m</b><br/>' +
-                '<small>Gambar kotak/polygon untuk menaruh liang, geser lewat titik tengah.</small>' +
+                '<small>Gambar kotak/polygon untuk menaruh liang, geser dengan menarik shape atau titik tengah.</small>' +
                 '<div style="margin-top:6px">Rotasi (&deg;)</div>' +
                 '<input type="range" id="liang_sudut_range" min="0" max="359" step="1" value="0" style="width:100%"/>' +
                 '<div style="display:flex;gap:4px;margin-top:4px">' +
@@ -2136,7 +2172,7 @@ $("#parsepeta").on("click", function () {
       })
     })
      $('#blok').change(async function (params) {
-                     let get_sub_blok = await $.get('/peta/makam_jatisari_v3?get_sub_blok='+$('#blok').val())
+                     let get_sub_blok = await $.get('/peta/makam_jatisari_v3?mmuuid=<%= master_makam[0].mmuuid%>&get_sub_blok='+encodeURIComponent($('#blok').val()))
         console.log(get_sub_blok.data);
         $('#sub_blok').empty()
             $('#sub_blok').append('<option value="">-- Pilih --</option>');
@@ -2147,7 +2183,7 @@ $("#parsepeta").on("click", function () {
      })
     window.onload = async function (params) {
                 
-                let data_blok = await $.get('/peta/makam_jatisari_v3?get_blok=1')
+                let data_blok = await $.get('/peta/makam_jatisari_v3?get_blok=1&mmuuid=<%= master_makam[0].mmuuid%>')
         console.log(data_blok.data);
         for (let i = 0; i < data_blok.data.length; i++) {
             $('#blok').append(`<option value="${data_blok.data[i].blok}">${data_blok.data[i].blok}</option>`)            
@@ -2187,7 +2223,7 @@ $("#parsepeta").on("click", function () {
     });
     async function cari_makam() {
         tumpang = 0
-                      var geoJsonUrl = root+"peta/makam_jatisari_v3"+`?blok=${$('#blok').val()}&sub_blok=${$('#sub_blok').val()}`;
+                      var geoJsonUrl = root+"peta/makam_jatisari_v3"+`?mmuuid=<%= master_makam[0].mmuuid%>&blok=${$('#blok').val()}&sub_blok=${$('#sub_blok').val()}`;
 
         $.getJSON(geoJsonUrl)
             .done(loadGeoJsonMakam);

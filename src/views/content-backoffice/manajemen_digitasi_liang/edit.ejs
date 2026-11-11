@@ -1,14 +1,10 @@
 <% include ../../template-backoffice/header.ejs %>
 
 <!-- BEGIN PAGE CONTENT -->
- <script src="https://unpkg.com/leaflet-path-transform@1.1.3/dist/L.Path.Transform.js"></script>
  <style>
-    /* Memastikan handle transform terlihat */
-    .leaflet-path-transform-handler {
-        fill: #ffffff;
-        stroke: #3388ff;
-        stroke-width: 2px;
-        cursor: crosshair;
+    /* liang bisa digeser dengan ditarik */
+    path.liang-geser.leaflet-interactive {
+        cursor: move;
     }
 </style>
  <style>
@@ -915,24 +911,17 @@ $("#parsepeta").on("click", function () {
                         color: '#e1e100', // Color the shape will turn when intersects 
                         message: '<strong>Digitasi Salah!' // Message that will show when intersect 
                     },
-                 shapeOptions: {
-                    color: '#bada55',
-                    transform: true, // Aktifkan transform saat pembuatan
-                    draggable: true  // Memungkinkan layer ditarik
-                }
-                },
-                circle: false, // Turns off this drawing tool 
-                rectangle: {
                     shapeOptions: {
-                        color: '#2196F3',
-                        transform: true, // WAJIB
-                        draggable: true
+                        color: '#bada55'
                     }
                 },
+                circle: false, // Turns off this drawing tool
+                rectangle: true,
                 marker: false
             },
             edit: {
-                featureGroup: drawnItems, //REQUIRED!! 
+                featureGroup: drawnItems, //REQUIRED!!
+                edit: false, // vertex tidak boleh diedit supaya ukuran tetap 1x2 m (geser pakai titik tengah)
                 remove: true
             }
         };
@@ -975,49 +964,125 @@ $("#parsepeta").on("click", function () {
 var drawControl = new L.Control.Draw(options);
     map.addControl(drawControl);
 
-    // 3. EVENT HANDLER SAAT OBJEK DIBUAT
-   map.on(L.Draw.Event.CREATED, function (event) {
-    drawnItems.clearLayers();
-    var layer = event.layer;
+        // liang 1 x 2 meter yang bisa diputar & digeser
+        var LIANG_LEBAR = 1, LIANG_PANJANG = 2 // meter
+        var liang = { center: null, sudut: 0, layer: null, marker: null }
 
-    // Tambahkan ke map/featureGroup dulu
-    layer.addTo(drawnItems);
-
-    // INISIALISASI TRANSFORM SECARA MANUAL
-    if (layer instanceof L.Path) { // Cek apakah ini polygon/rectangle
-        layer.transform = new L.Handler.PathTransform(layer);
-        
-        // Aktifkan dengan opsi rotasi eksplisit
-        layer.transform.enable({
-            rotation: true,
-            scaling: true,
-            uniformScaling: false // Set true jika ingin skala proporsional
-        });
-
-        // Update WKT saat rotasi/skala selesai
-        layer.on('transformend dragend', function() {
-            var wktString = toWKT(layer);
-            $('#SHAPE').val(wktString);
-            console.log("Update WKT:", wktString);
-        });
-    }
-
-    // Set nilai awal ke input SHAPE
-    $('#SHAPE').val(toWKT(layer));
-});
-map.on(L.Draw.Event.DELETED, function (event) {
-    var layers = event.layers;
-    layers.eachLayer(function (layer) {
-        // 1. Matikan transform secara paksa agar CSS/titik kontrol hilang
-        if (layer.transform) {
-            layer.transform.disable();
+        // sudut = derajat searah jarum jam dari utara, sisi panjang (2 m) mengikuti sudut
+        function kotakLiang(center, sudut) {
+            var rad = sudut * Math.PI / 180
+            var mLat = 111320
+            var mLng = 111320 * Math.cos(center.lat * Math.PI / 180)
+            var w = LIANG_LEBAR / 2, h = LIANG_PANJANG / 2
+            return [[-w, -h], [w, -h], [w, h], [-w, h]].map(function (p) {
+                var x = p[0] * Math.cos(rad) + p[1] * Math.sin(rad)
+                var y = -p[0] * Math.sin(rad) + p[1] * Math.cos(rad)
+                return L.latLng(center.lat + y / mLat, center.lng + x / mLng)
+            })
         }
-        
-        // 2. Kosongkan input SHAPE karena objek sudah dihapus
-        $('#SHAPE').val('');
-        console.log("Layer dihapus, koordinat dikosongkan.");
-    });
-});
+
+        function gambarLiang() {
+            if (!liang.center) return
+            var titik = kotakLiang(liang.center, liang.sudut)
+            if (liang.layer) {
+                liang.layer.setLatLngs(titik)
+            } else {
+                liang.layer = L.polygon(titik, { color: '#bada55', className: 'liang-geser' })
+                liang.layer.on('mousedown touchstart', mulaiGeserLiang)
+                drawnItems.addLayer(liang.layer)
+            }
+            if (!liang.marker) {
+                liang.marker = L.marker(liang.center, { draggable: true, title: 'Geser liang' }).addTo(map)
+                liang.marker.on('drag', function (e) {
+                    liang.center = e.target.getLatLng()
+                    gambarLiang()
+                })
+            }
+            $('#SHAPE').val(toWKT(liang.layer))
+            $('#liang_sudut, #liang_sudut_range').val(liang.sudut)
+        }
+
+        // geser liang dengan menarik shape-nya langsung
+        var sedangMenggambar = false
+        map.on('draw:drawstart draw:editstart draw:deletestart', function () { sedangMenggambar = true })
+        map.on('draw:drawstop draw:editstop draw:deletestop', function () { sedangMenggambar = false })
+
+        function mulaiGeserLiang(e) {
+            if (sedangMenggambar || !liang.center) return
+            L.DomEvent.stop(e)
+            var awal = e.latlng, pusatAwal = liang.center
+            var mapBisaDigeser = map.dragging.enabled()
+            map.dragging.disable()
+
+            function geser(ev) {
+                var t = ev.touches && ev.touches.length ? ev.touches[0] : ev
+                var posisi = map.mouseEventToLatLng(t)
+                liang.center = L.latLng(pusatAwal.lat + posisi.lat - awal.lat, pusatAwal.lng + posisi.lng - awal.lng)
+                liang.marker.setLatLng(liang.center)
+                gambarLiang()
+                L.DomEvent.preventDefault(ev)
+            }
+            function selesai() {
+                L.DomEvent.off(document, 'mousemove touchmove', geser)
+                L.DomEvent.off(document, 'mouseup touchend', selesai)
+                if (mapBisaDigeser) map.dragging.enable()
+            }
+            L.DomEvent.on(document, 'mousemove touchmove', geser)
+            L.DomEvent.on(document, 'mouseup touchend', selesai)
+        }
+
+        function hapusLiang() {
+            if (liang.marker) map.removeLayer(liang.marker)
+            liang = { center: null, sudut: liang.sudut, layer: null, marker: null }
+            $('#SHAPE').val('')
+        }
+
+        function setSudut(nilai) {
+            nilai = parseFloat(nilai)
+            if (isNaN(nilai)) return
+            liang.sudut = ((nilai % 360) + 360) % 360
+            gambarLiang()
+        }
+
+        var kontrolLiang = L.control({ position: 'topright' })
+        kontrolLiang.onAdd = function () {
+            var div = L.DomUtil.create('div', 'leaflet-bar')
+            div.style.background = '#fff'
+            div.style.padding = '8px'
+            div.style.width = '220px'
+            div.innerHTML =
+                '<b>Liang ' + LIANG_LEBAR + ' x ' + LIANG_PANJANG + ' m</b><br/>' +
+                '<small>Gambar kotak/polygon untuk menaruh liang, geser dengan menarik shape atau titik tengah.</small>' +
+                '<div style="margin-top:6px">Rotasi (&deg;)</div>' +
+                '<input type="range" id="liang_sudut_range" min="0" max="359" step="1" value="0" style="width:100%"/>' +
+                '<div style="display:flex;gap:4px;margin-top:4px">' +
+                '<button type="button" class="btn btn-default btn-sm" id="liang_kiri" style="margin:0">&#8634; 5</button>' +
+                '<input type="number" id="liang_sudut" min="0" max="359" step="0.5" value="0" class="form-control input-sm" style="width:70px"/>' +
+                '<button type="button" class="btn btn-default btn-sm" id="liang_kanan" style="margin:0">&#8635; 5</button>' +
+                '</div>'
+            L.DomEvent.disableClickPropagation(div)
+            L.DomEvent.disableScrollPropagation(div)
+            return div
+        }
+        kontrolLiang.addTo(map)
+
+        $(document).on('input change', '#liang_sudut_range, #liang_sudut', function () { setSudut($(this).val()) })
+        $(document).on('click', '#liang_kiri', function () { setSudut(liang.sudut - 5) })
+        $(document).on('click', '#liang_kanan', function () { setSudut(liang.sudut + 5) })
+
+        map.on(L.Draw.Event.CREATED, function (event) {
+            drawnItems.clearLayers();
+            hapusLiang()
+            // posisi liang = titik tengah gambar, ukuran dipaksa 1 x 2 m
+            liang.center = event.layer.getBounds().getCenter()
+            gambarLiang()
+            map.setView(liang.center, Math.max(map.getZoom(), 21))
+        });
+
+        map.on(L.Draw.Event.DELETED, function () {
+            hapusLiang()
+        });
+
         var locateIcon = L.ExtraMarkers.icon({
             icon: 'fa-map-marker',
             markerColor: 'blue-dark',

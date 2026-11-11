@@ -247,15 +247,21 @@ tambahan+= ' and m.master_makam_id =  ' +req.user[0].master_makam_id
    router.get('/makam_jatisari_v3',cek_login,async function(req, res){
  //connection.connect();
  //console.log(req.query)
- let {blok ,get_blok, id_kec , sub_blok ,get_sub_blok} = req.query
+ let {blok ,get_blok, id_kec , sub_blok ,get_sub_blok, mmuuid} = req.query
  let value = []
  let value2 = []
  let tambahan1 = '  '
 
  var tambahan = `where 1 `;
+ // TPU dicari lewat mmuuid: user pengelola pakai mmuuid miliknya (dari login),
+ // admin tidak punya TPU jadi pakai mmuuid halaman yang sedang dibuka
+ let pakaiTpu = req.user[0].is_admin==0 || !!mmuuid
   if (req.user[0].is_admin==0) {
-tambahan1+= ' and m.id = ? '
-    value2.push(req.user[0].master_makam_id)
+tambahan1+= ' and m.mmuuid = ? '
+    value2.push(req.user[0].mmuuid)
+ } else if (mmuuid) {
+    tambahan1+= ' and m.mmuuid = ? '
+    value2.push(mmuuid)
  }
  if(id_kec){
     tambahan = tambahan+" and kecamatan= '"+req.query.id_kec+"'";
@@ -276,12 +282,17 @@ tambahan1+= ' and m.id = ? '
           tambahan += ` and sub_blok =  '${sub_blok}' `
  }
   let master_makam = await sql_enak.raw(`SELECT *  FROM master_makam m where  1 ${tambahan1}`,value2)
-  console.log(master_makam[0][0].nama_tpu);
-  
-  if (req.user[0].is_admin==0) {
-      tambahan += ` and nama_tpu = '${master_makam[0][0].nama_tpu}' `
+
+  if (pakaiTpu) {
+      if (!master_makam[0].length) {
+        tambahan += ` and 0 `
+      } else {
+        // TRIM: nama_tpu di master_makam ada yang berspasi di belakang
+        tambahan += ` and TRIM(nama_tpu) = TRIM(?) `
+        value.push(master_makam[0][0].nama_tpu)
+      }
   }
- connection.query(`SELECT ${a}  FROM makam_jatisari_v3 m  `+tambahan, function(err, rows, fields) {
+ connection.query(`SELECT ${a}  FROM makam_jatisari_v3 m  `+tambahan, value, function(err, rows, fields) {
    if (err) throw err;
 
   //console.log("SELECT ST_AsWKT(ST_SRID(admin_kec.the_geom, 0)) as geometry FROM admin_kec WHERE MBRContains(ST_GeomFromText( 'POLYGON(("+req.query.kiri_lng+" "+req.query.kiri_lat+","+req.query.kiri_lng+" "+req.query.kanan_lat+","+req.query.kanan_lng+" "+req.query.kanan_lat+","+req.query.kanan_lng+" "+req.query.kiri_lat+","+req.query.kiri_lng+" "+req.query.kiri_lat+"))' ),admin_kec.the_geom");
