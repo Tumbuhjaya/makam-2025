@@ -661,6 +661,10 @@ if (confirm(`Apakah anda akan ${status==0?'mereset':status!=0?'membatalkan':'men
     console.log({nomor_sk_id,status:2});
     
 
+    if (!nik) {
+      alert('NIK penandatangan belum terdaftar. Silahkan isi NIK pada data user terlebih dahulu')
+      return
+    }
     if (nik && passphrase) {
         // const willUpdate = await swal({
         //     title: "",

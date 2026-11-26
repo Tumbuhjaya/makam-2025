@@ -58,7 +58,10 @@ router.get('/umum/pj',  cek_login, async function(req, res) {
   }
   let penandatangan = await sql_enak.raw(`SELECT * FROM penandatangan p WHERE p.deleted  = 0`)
    let data = [[]]
-  res.render('content-backoffice/manajemen_penandatanganan_ijin/pemakaman',{cetak:req.query.cetak,data:data[0],user:req.user[0],penandatangan:penandatangan[0]});
+  // NIK diambil ulang dari DB, karena data user di session adalah salinan saat login (bisa kosong kalau NIK baru diisi setelahnya)
+  let nik = await sql_enak.raw(`SELECT NIK FROM user WHERE id_user = ?`, [req.user[0].id_user])
+  let user = Object.assign({}, req.user[0], {NIK: nik[0][0] ? nik[0][0].NIK : req.user[0].NIK})
+  res.render('content-backoffice/manajemen_penandatanganan_ijin/pemakaman',{cetak:req.query.cetak,data:data[0],user:user,penandatangan:penandatangan[0]});
 });
 
 

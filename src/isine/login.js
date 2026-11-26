@@ -38,7 +38,7 @@ passport.use(new LocalStrategy({
 },
 function(req, username, password, done) {
     // PERBAIKAN: parameterized query
-    const sql = "SELECT * from user u left join master_makam mm on mm.id = u.master_makam_id WHERE u.username = ?";
+    const sql = "SELECT * from user u left join master_makam mm on mm.id = u.master_makam_id WHERE u.username = ? and u.deleted = 0";
     connection.query(sql, [username], function(err, rows, fields) {
         if (err) {
             // handle error dengan baik (jangan throw di production)
