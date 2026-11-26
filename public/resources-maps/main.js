@@ -1,5 +1,6 @@
   //  var root ="https://makam.semarangkota.go.id/";
-  var root ="http://survplus.id:8941/";
+  // var root ="http://survplus.id:8941/";
+  var root ="http://localhost:8941/";
    String.prototype.replaceAll = function(search, replacement) {
        var target = this;
        return target.split(search).join(replacement);
