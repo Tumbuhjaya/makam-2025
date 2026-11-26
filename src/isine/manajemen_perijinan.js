@@ -428,7 +428,7 @@ router.post('/perpanjangan/pemakaman', cek_login,async function(req, res) {
   let a = ''
   let value = []
 
-  let b = `*,DATE_FORMAT(p2.inserted_perpanjangan , '%d-%m-%Y') as inserted_perpanjangan,(SELECT CASE when  p.tanggal_surat = '00-00-0000' or ISNULL(p.tanggal_surat)    then 'false' ELSE 'true' END as x FROM perpanjangan p WHERE p.id  = p2.id) as cek,NOW()>p2.tanggal_berlaku_surat  as kadaluarsa,CASE 
+  let b = `*,p2.status_tte as status_tte,DATE_FORMAT(p2.inserted_perpanjangan , '%d-%m-%Y') as inserted_perpanjangan,(SELECT CASE when  p.tanggal_surat = '00-00-0000' or ISNULL(p.tanggal_surat)    then 'false' ELSE 'true' END as x FROM perpanjangan p WHERE p.id  = p2.id) as cek,NOW()>p2.tanggal_berlaku_surat  as kadaluarsa,CASE 
   when p2.status_pembayaran = 0  then 'Belum Dibayar'
   when p2.status_pembayaran = 1  then 'Sudah Dibayar'
   END as status_pembayaran,DATE_FORMAT(p2.tanggal_surat , '%d-%m-%Y') as tanggal_surat,DATE_FORMAT(p2.tanggal_berlaku_surat , '%d-%m-%Y') as tanggal_berlaku_surat
