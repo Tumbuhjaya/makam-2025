@@ -229,7 +229,7 @@
                       <%if(data[i].periode!=0 && user.is_admin==1){%>
                         <li><button class="btn btn-info btn-embossed btn-sm upload_sk" role="button" style="margin-right: 0;" data-dokument="<%= data[i].dokument_id%>" data-toggle="modal"  data-target="#exampleModal">Upload SK</button></li>
                       <%}%>
-                      <%if(data[i].sk){%>
+                      <%if(data[i].sk && data[i].status_tte==2){%>
                       <li><a href="/foto/<%= data[i].sk%>" class="btn btn-dark btn-sm btn-embossed" download>Download SK</a></li>
                       <%}%>
                       <%if(data[i].periode == 0&&data[i].status != 2){%>
@@ -437,8 +437,10 @@
     let b = hsl2.data[i].cek=='true' && hsl2.user.is_admin==1?`<li><a class="btn btn-success btn-embossed btn-sm" target="_blank" href="/manajemen_perijinan/pemakaman/cetak/${ hsl2.data[i].juuid}" role="button" >Cetak Draft SK</a></li>`:''
     console.log(hsl2.data[i]);
     
-    let c = hsl2.data[i].periode!=0 ?`<li><button class="btn btn-info btn-embossed btn-sm upload_sk" role="button" style="margin-right: 0;" data-dokument="${ hsl2.data[i].dokument_id}" data-toggle="modal"  data-target="#exampleModal">Upload SK</button></li>`:''
-    let d = hsl2.data[i].sk?`<li><a href="/foto/${ hsl2.data[i].sk}" class="btn btn-dark btn-sm btn-embossed" download>Download SK</a></li>`:''
+    // upload SK hanya untuk superadmin, admin TPU tidak boleh upload
+    let c = hsl2.data[i].periode!=0 && hsl2.user.is_admin==1 ?`<li><button class="btn btn-info btn-embossed btn-sm upload_sk" role="button" style="margin-right: 0;" data-dokument="${ hsl2.data[i].dokument_id}" data-toggle="modal"  data-target="#exampleModal">Upload SK</button></li>`:''
+    // download SK hanya muncul setelah TTE selesai (disetujui)
+    let d = hsl2.data[i].sk&&hsl2.data[i].status_tte==2?`<li><a href="/foto/${ hsl2.data[i].sk}" class="btn btn-dark btn-sm btn-embossed" download>Download SK</a></li>`:''
     let e = hsl2.data[i].periode == 0&&hsl2.data[i].status != 2?`<li><a href="/manajemen_perijinan/pemakaman/edit/${ hsl2.data[i].jenazah_id}" class="btn btn-warning btn-sm btn-embossed">Edit</a></li>`:''
     let f1 = hsl2.data[i].foto_ktp_pemohon?`<li><a href="/foto/${hsl2.data[i].foto_ktp_pemohon}" target="_blank">KTP Ahli Waris</a></li>`:''
     let f2 = hsl2.data[i].foto_ktp_jenazah?`<li><a href="/foto/${hsl2.data[i].foto_ktp_jenazah}" target="_blank">KTP Jenazah</a></li>`:''

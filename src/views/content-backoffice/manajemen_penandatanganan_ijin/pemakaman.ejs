@@ -686,9 +686,14 @@ if (confirm(`Apakah anda akan ${status==0?'mereset':status!=0?'membatalkan':'men
           
         
         if (confirm(`Apakah anda akan menyetujui data ini?`)) {
-                          await $.post(rooturl+'/manajemen_penandatanganan_ijin/edit_sk',{id:nomor_sk_id,status_tte:2})
-
-        let a = await $.post('/cetak-tte-qrcode', {file, nik, passphrase});
+        // status disetujui baru disimpan setelah TTE berhasil, supaya SK yang belum ter-TTE tidak bisa didownload
+        try {
+          let a = await $.post('/cetak-tte-qrcode', {file, nik, passphrase});
+        } catch (err) {
+          alert('TTE gagal: ' + JSON.stringify(err.responseJSON ? err.responseJSON.message : err.statusText))
+          return
+        }
+        await $.post(rooturl+'/manajemen_penandatanganan_ijin/edit_sk',{id:nomor_sk_id,status_tte:2})
                     // data_table.ajax.url(`${rooturl}/nomor_sk/list`).load();
                     location.reload()
                     $('#modalAutentifikasiTte').modal('toggle')

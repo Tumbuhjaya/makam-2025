@@ -5,7 +5,8 @@ require('dotenv').config();
 
 const ejs = require('ejs');
 const path = require('path');
-const email = function (email, subject, isi) { 
+// lampiran (opsional): [{ filename, path }] / [{ filename, content }] sesuai format attachments nodemailer
+const email = function (email, subject, isi, lampiran) {
     console.log(email, subject, isi);
     var transporter = nodemailer.createTransport({
         service: 'Gmail',
@@ -25,13 +26,14 @@ const email = function (email, subject, isi) {
       <p style="color: #666666;">${isi}.</p>
       
       <div style="margin-top: 20px;">
-        <a href="https://pindah.fosan.id/riset/usulan" style="display: inline-block; background-color: #007BFF; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Kembali</a>
+        <a href="${process.env.APP_PUBLIC_URL || '#'}" style="display: inline-block; background-color: #007BFF; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Kembali</a>
       </div>
       
       <p style="color: #999999; margin-top: 20px;">If you have any questions, feel free to <a href="#" style="color: #007BFF;">contact our support team</a>.</p>
     </div>
   </div>
-` 
+`,
+        attachments: lampiran || []
     };
 let a =''
     transporter.sendMail(mainOptions, function (err, info) {

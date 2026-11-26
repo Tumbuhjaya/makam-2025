@@ -16,6 +16,7 @@ var express = require('express')
 const fs = require('fs');
 const FormData = require('form-data');
 var storage = require('./storage');
+var email = require('./helpper/email.js').email;
 
   var nodemailer = require('nodemailer')
   var transporter = nodemailer.createTransport({
@@ -324,6 +325,17 @@ app.post('/cetak-tte-qrcode', async (req, res) => {
     // 🔹 5. Simpan hasil PDF
     await storage.putFile('hasil_'+file, Buffer.from(response.data), 'application/pdf');
     await sql_enak.raw(`UPDATE dokument SET sk = ? WHERE sk = ?`, ['hasil_'+file, file]);
+
+    // 🔹 6. TTE selesai -> baru kirim email SK terbit ke pemohon (khusus pemakaman jenazah)
+    const pemohon = await sql_enak.raw(`SELECT p.email FROM dokument d LEFT JOIN jenazah j ON j.id = d.jenazah_id LEFT JOIN permohonan p ON p.jenazah_id = j.id
+      WHERE d.sk = ? AND p.deleted = 0 AND j.deleted = 0 AND p.jns_pemakaman = 0 AND j.kategori_tpu = 0 LIMIT 1`, ['hasil_'+file]);
+    if (pemohon[0][0] && pemohon[0][0].email) {
+      const linkSk = process.env.APP_PUBLIC_URL + '/foto/hasil_'+file
+      email(pemohon[0][0].email,
+        'Surat Keputusan (SK) ijin penggunaan tanah makam/pemakaman jenazah terbit',
+        `Surat Keputusan (SK) ijin penggunaan tanah makam/pemakaman jenazah telah terbit. File SK terlampir pada email ini, atau dapat diunduh melalui link berikut : <a href="${linkSk}" target="_blank">${linkSk}</a>`,
+        [{ filename: 'hasil_'+file, content: Buffer.from(response.data), contentType: 'application/pdf' }]);
+    }
 
     return res.json({
       status: 'success',

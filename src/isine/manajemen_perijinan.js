@@ -758,7 +758,9 @@ LEFT join kelurahan kj2 on kj2.id_kelurahan = j.kel_id    WHERE  j.juuid='${req.
 
   )
   if (data[0][0].jns_pemakaman == 0) {
-    res.render('content-backoffice/manajemen_ijin/cetak_permohonan_pemakaman',{data:data[0],jumlah_perpanjangan:jumlah_perpanjangan[0][0].jumlah_perpanjangan})
+    // nama penandatangan diambil dari user role Kepala UPTD (is_admin = 2)
+    const kepala_uptd = await sql_enak.raw(`select fullname from user where deleted = 0 and is_admin = 2 order by id_user desc limit 1`)
+    res.render('content-backoffice/manajemen_ijin/cetak_permohonan_pemakaman',{data:data[0],jumlah_perpanjangan:jumlah_perpanjangan[0][0].jumlah_perpanjangan,nama_kepala_uptd:kepala_uptd[0][0]?kepala_uptd[0][0].fullname:''})
 
   } else {
     let sql = `SELECT j.nama_jenazah , j.id FROM jenazah j WHERE j.makam_id = ? and j.deleted = 0 and j.juuid !='${req.params.id}'`
@@ -899,14 +901,22 @@ router.post(`/perpanjangan_makam`,async function (req,res) {
 })
 
 router.post(`/uploadSK`,cek_login,upload.fields([{name:'sk',maxCount:1}]),async function (req,res) {
-  const dokument = {}  
+  // pemakaman jenazah: upload SK hanya oleh superadmin
+  if (req.body.jns_permohonan == 0 && req.user[0].is_admin != 1) {
+    return res.status(403).send('Hanya superadmin yang dapat upload SK')
+  }
+  const dokument = {}
   let jns_permohonan =  req.body.jns_permohonan
   delete dokument.jns_permohonan
   if (req.files) {
     if (req.files["sk"]) {
       var nama_file = req.files["sk"][0].filename;
-      dokument["sk"] = nama_file;  
+      dokument["sk"] = nama_file;
     }
+  }
+  // draft baru diupload -> proses TTE dimulai dari awal
+  if (jns_permohonan == 0) {
+    dokument.status_tte = 0
   }
     const { v4: uuidv4 } = await import('uuid');
   let log = {}
@@ -933,12 +943,12 @@ await sql_enak("dokument")
   if (jns_permohonan == 0) {
     // let text = `SK ijin penggunaan tanah makam/pemakaman jenazah telah terbit. Silahkan klik link berikut "https://makam.semarangkota.go.id/manajemen_perijinan/pemakaman/cetak/${data[0][0].jenazah_id}"`
     // let text = [`Surat Keputusan (SK) ijin penggunaan tanah makam/pemakaman jenazah`,`Surat Keputusan (SK) ijin penggunaan tanah makam/pemakaman jenazah telah terbit. Silahkan download/lihat file tersebut melalui tombol dibawah ini<br/><a href="https://makam.semarangkota.go.id/foto/${nama_file}" target="_blank" class="button" style="color:white">Download/Lihat</a>"`]
-   let text= `https://makam.semarangkota.go.id/foto/${nama_file}`
-    // email(data[0][0].email,'SK Terbit',text)
-    email(data[0][0].email,'Surat Keputusan (SK) ijin penggunaan tanah makam/pemakaman jenazah terbit',text)
-    let hasilWa =await kirimWa(data[0][0].hp,text)
+    // notifikasi SK terbit tidak dikirim di sini, karena proses TTE baru dimulai
+   // let text= `https://makam.semarangkota.go.id/foto/${nama_file}`
+    // email(data[0][0].email,'Surat Keputusan (SK) ijin penggunaan tanah makam/pemakaman jenazah terbit',text)
+    // let hasilWa =await kirimWa(data[0][0].hp,text)
 
-    res.redirect(`/manajemen_perijinan/pemakaman?cetak=`+data[0][0].juuid)
+    res.redirect(`/manajemen_perijinan/pemakaman`)
   } else if (jns_permohonan == 4) {
     // let text = `SK ijin pemakaman tumpang telah terbit. Silahkan klik link berikut "https://makam.semarangkota.go.id/manajemen_perijinan/pemakaman/cetak/${data[0][0].jenazah_id}"`
     // let text = `Surat Keputusan (SK) ijin pemakaman tumpang telah terbit. Silahkan download/lihat file tersebut melalui link berikut ini : "https://makam.semarangkota.go.id/foto/${nama_file}"`
