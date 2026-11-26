@@ -79,6 +79,8 @@ function kirimWa(hp,text) {
   })
 }
 var storage = require('../storage').storage;
+var fileStorage = require('../storage');
+var kirimEmail = require('../helpper/email.js').email;
 
 var upload = multer({ storage: storage })
 
@@ -380,9 +382,10 @@ router.post('/list_pemakaman',cek_login,async function(req, res) {
   }
   
   if (cari) {
-    o += ` and ( p.pin like ? or d.periode  like ? or d.sk  like ? or  p2.status   like ? or  nama_ahli_waris   like ? or nama_jenazah  like ? or k.kecamatan   like ? or m.nama_tpu   like ? or m.blok   like ? or m.sub_blok  like ? or m.no_liang  like ? or p2.kode_billing  like ?  or  j.inserted   like ? or j.tanggal_meninggal like ? or j.tanggal_dimakamkan like ? ) `
+    o += ` and ( p.pin like ? or d.periode  like ? or d.sk  like ? or  p2.status   like ? or  nama_ahli_waris   like ? or nama_jenazah  like ? or k.kecamatan   like ? or m.nama_tpu   like ? or m.blok   like ? or m.sub_blok  like ? or m.no_liang  like ? or p2.kode_billing  like ?  or  j.inserted   like ? or j.tanggal_meninggal like ? or j.tanggal_dimakamkan like ? or p.email like ? ) `
   
     
+value.push(`%${cari}%`)
 value.push(`%${cari}%`)
 value.push(`%${cari}%`)
 value.push(`%${cari}%`)
@@ -407,7 +410,7 @@ value.push(`%${cari}%`)
     o += ` and j.inserted <=?`
     value.push(akhir)
   }
-  let sql = ` j.juuid,d.status_tte, p.pin,d.periode,d.sk, p2.status,foto_ktp_pemohon,foto_ktp_jenazah,surat_kematian,surat_lurah, nama_ahli_waris ,nama_jenazah,k.kecamatan, m.kecamatan as kecamatan_tpu,nama_tpu ,m.blok ,m.sub_blok,m.no_liang,p2.kode_billing,(SELECT CASE when isnull(p.tanggal_surat) or isnull(p.tanggal_berlaku_surat)   then 'false' ELSE 'true' END as x FROM perpanjangan p WHERE p.id  = p2.id) as cek,NOW()>p2.tanggal_berlaku_surat  as kadaluarsa,CASE when p2.status_pembayaran = 0  then 'Belum Dibayar' when p2.status_pembayaran = 1  then 'Sudah Dibayar' END as status_pembayaran,DATE_FORMAT(p2.tanggal_surat , '%d-%m-%Y') as tanggal_surat,DATE_FORMAT(p2.tanggal_berlaku_surat , '%d-%m-%Y') as tanggal_berlaku_surat  ,DATE_FORMAT(j.inserted , '%d-%m-%Y') as inserted ,DATE_FORMAT(j.tanggal_meninggal  , '%d-%m-%Y') as tanggal_meninggal,DATE_FORMAT(j.tanggal_dimakamkan  , '%d-%m-%Y') as tanggal_dimakamkan,p.id as permohonan_id , j.id as jenazah_id , d.id as dokument_id,k.kecamatan , p2.id as perpanjangan_id`
+  let sql = ` j.juuid,d.status_tte, p.pin,d.periode,d.sk, p2.status,foto_ktp_pemohon,foto_ktp_jenazah,surat_kematian,surat_lurah, nama_ahli_waris ,p.email,nama_jenazah,k.kecamatan, m.kecamatan as kecamatan_tpu,nama_tpu ,m.blok ,m.sub_blok,m.no_liang,p2.kode_billing,(SELECT CASE when isnull(p.tanggal_surat) or isnull(p.tanggal_berlaku_surat)   then 'false' ELSE 'true' END as x FROM perpanjangan p WHERE p.id  = p2.id) as cek,NOW()>p2.tanggal_berlaku_surat  as kadaluarsa,CASE when p2.status_pembayaran = 0  then 'Belum Dibayar' when p2.status_pembayaran = 1  then 'Sudah Dibayar' END as status_pembayaran,DATE_FORMAT(p2.tanggal_surat , '%d-%m-%Y') as tanggal_surat,DATE_FORMAT(p2.tanggal_berlaku_surat , '%d-%m-%Y') as tanggal_berlaku_surat  ,DATE_FORMAT(j.inserted , '%d-%m-%Y') as inserted ,DATE_FORMAT(j.tanggal_meninggal  , '%d-%m-%Y') as tanggal_meninggal,DATE_FORMAT(j.tanggal_dimakamkan  , '%d-%m-%Y') as tanggal_dimakamkan,p.id as permohonan_id , j.id as jenazah_id , d.id as dokument_id,k.kecamatan , p2.id as perpanjangan_id`
   if (count) {
     sql = ' count(*) as jml'
   }
@@ -734,7 +737,7 @@ router.get(`/pemakaman/cetak/:id`,async function (req,res) {
   left join kecamatan k on j2.kec_id = k.id_kecamatan  LEFT join kelurahan k2 on k2.id_kelurahan = j2.kel_id  WHERE j2.id = d.jenazah_id)
   ELSE j.alamat END as alamat_jenazah,
    CONCAT(m.nama_tpu , ' blok  ' , m.blok,' sub blok  ', m.sub_blok , ' nomor liang sistem ',m.no_liang ) as alamat_makam
-  ,DATE_FORMAT(j.inserted , '%d-%m-%Y') as inserted,u.jabatan as jab_penanda,u.fullname  as nama_penanda ,DATE_FORMAT(j.tanggal_meninggal  , '%d-%m-%Y') as tanggal_meninggal,DATE_FORMAT(j.tanggal_dimakamkan  , '%d-%m-%Y') as tanggal_dimakamkan,p.id as permohonan_id , j.id as jenazah_id , d.id as dokument_id , m.id as makam_id 
+  ,DATE_FORMAT(j.inserted , '%d-%m-%Y') as inserted,p.email as email_pemohon,u.jabatan as jab_penanda,u.fullname  as nama_penanda ,DATE_FORMAT(j.tanggal_meninggal  , '%d-%m-%Y') as tanggal_meninggal,DATE_FORMAT(j.tanggal_dimakamkan  , '%d-%m-%Y') as tanggal_dimakamkan,p.id as permohonan_id , j.id as jenazah_id , d.id as dokument_id , m.id as makam_id 
   from jenazah j  
   left join permohonan p on j.id = p.jenazah_id
   LEFT JOIN dokument d on d.jenazah_id = j.id 
@@ -971,6 +974,47 @@ await sql_enak("dokument")
 
     res.redirect(`/manajemen_perijinan/pesan_tempat_makam?cetak=`+data[0][0].juuid)
   }
+})
+// upload SK yang sudah di TTE (di luar aplikasi) -> SK terbit, email ke pemohon, download SK muncul untuk pengelola TPU
+router.post(`/uploadSKTTE`,cek_login,upload.fields([{name:'sk_tte',maxCount:1}]),async function (req,res) {
+  if (req.user[0].is_admin != 1) {
+    return res.status(403).send('Hanya superadmin yang dapat upload SK TTE')
+  }
+  if (!req.files || !req.files["sk_tte"]) {
+    return res.redirect(`/manajemen_perijinan/pemakaman`)
+  }
+  let nama_file = req.files["sk_tte"][0].filename
+
+  const { v4: uuidv4 } = await import('uuid');
+  let log = {}
+  let now = new Date()
+  let luuid = uuidv4()
+  log.id = req.body.id
+  log.insertedAt = now
+  log.lastUpdateAt = now
+  log.log_id = luuid
+  log.log_uuid = luuid
+  log.luuid= luuid
+  log.riwayat = 'SK yang telah di TTE diupload, SK terbit'
+  log.t = 'dokument'
+  log.user_uuid = req.user[0].id_user
+  await sql_enak.insert(log).into('log')
+
+  await sql_enak("dokument")
+  .where("id", "=", req.body.id)
+  .update({sk:nama_file,status_tte:2})
+
+  let data = await sql_enak.raw(`SELECT p.email FROM dokument d LEFT JOIN permohonan p ON p.jenazah_id = d.jenazah_id WHERE p.deleted = 0 AND d.id = ? LIMIT 1`, [req.body.id])
+  if (data[0][0] && data[0][0].email) {
+    let linkSk = process.env.APP_PUBLIC_URL + '/foto/' + nama_file
+    let fileBuffer = await fileStorage.getFile(nama_file)
+    kirimEmail(data[0][0].email,
+      'Surat Keputusan (SK) ijin penggunaan tanah makam/pemakaman jenazah terbit',
+      `Surat Keputusan (SK) ijin penggunaan tanah makam/pemakaman jenazah telah terbit. File SK terlampir pada email ini, atau dapat diunduh melalui link berikut : <a href="${linkSk}" target="_blank">${linkSk}</a>`,
+      [{ filename: nama_file, content: fileBuffer }])
+  }
+
+  res.redirect(`/manajemen_perijinan/pemakaman`)
 })
 router.post(`/uploadSKPerpanjangan`,upload.fields([{name:'sk_perpanjangan',maxCount:1}]),async function (req,res) {
   const perpanjangan = {}  
