@@ -83,7 +83,7 @@
                       <th class="header" colspan="2" style="text-align: center;">Retribusi & Pembayaran</th>
                       <th class="header" rowspan="2" style="min-width: 100px;">Masa Berlaku Perijinan Sampai Dengan</th>
       
-                      <th class="header" rowspan="2" style="min-width: 640px;">Option</th>
+                      <th class="header" rowspan="2" style="min-width: 500px;">Option</th>
                     </tr>
       
                     <tr>
@@ -162,21 +162,19 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Upload SK yang sudah ditandatangani</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Upload Draft SK untuk di TTE</h4>
       </div>
       <div class="modal-body">
         <form action="/manajemen_perijinan/uploadSK" method="post" enctype="multipart/form-data">
           <div class="form-group">
-            <label>Upload SK</label>
+            <label>File Draft SK</label>
             <input type="file" class="form-control" name="sk" id=""  accept="image/*,.pdf">
             <input type="text" name="id" id="dokument_id" hidden>
             <input type="text" class="" name="jns_permohonan" id="" value="4" hidden>
 
           </div>
-          <button type="submit" class="btn btn-primary">Upload</button>
+          <button type="submit" class="btn btn-info btn-embossed">Simpan</button>
         </form>
       </div>
     </div>
@@ -408,8 +406,8 @@
     let a = hsl2.user.is_admin==1?`<li><button style="margin-right:0;" class="btn btn-warning btn-embossed btn-sm cetak_sk"  data-jenazah_id="${ hsl2.data[i].jenazah_id}" data-juuid="${ hsl2.data[i].juuid}" data-id="${ hsl2.data[i].perpanjangan_id}"  data-dokument_id="${ hsl2.data[i].dokument_id}"  data-toggle="modal" data-target=".modal-cetak-sk">Buat Draft SK</button></li>`:''
     // let b = hsl2.data[i].cek=='true' && hsl2.user.is_admin==1&&hsl2.data[i].status_pembayaran == 'Sudah Dibayar'?`<li><a class="btn btn-success btn-embossed btn-sm" target="_blank" href="/manajemen_perijinan/pemakaman/cetak/${ hsl2.data[i].jenazah_id}" role="button" >Cetak Draft SK</a></li>`:''
     let b = hsl2.data[i].cek=='true' && hsl2.user.is_admin==1?`<li><a class="btn btn-success btn-embossed btn-sm" target="_blank" href="/manajemen_perijinan/pemakaman/cetak/${hsl2.data[i].juuid}" role="button">Cetak Draft SK</a></li>`:''
-    let c =  hsl2.data[i].periode!=0 && hsl2.data[i].status_pembayaran == 'Sudah Dibayar'?`<li><button class="btn btn-info btn-embossed btn-sm upload_sk" style="margin-right: 0;" role="button" style="margin-right: 0;" data-dokument="${ hsl2.data[i].dokument_id}" data-toggle="modal"  data-target="#exampleModal">Upload SK</button></li>`:''
-    let d = hsl2.data[i].sk?`<li><a href="/foto/${ hsl2.data[i].sk}" class="btn btn-dark btn-sm btn-embossed" download>Download SK</a></li>`:''
+    let c =  hsl2.data[i].periode!=0 && hsl2.data[i].status_pembayaran == 'Sudah Dibayar'?`<li><button class="btn btn-info btn-embossed btn-sm upload_sk" style="margin-right: 0;" role="button" style="margin-right: 0;" data-dokument="${ hsl2.data[i].dokument_id}" data-toggle="modal"  data-target="#exampleModal">Upload Draft SK (TTE)</button></li>`:''
+    let d = hsl2.data[i].sk?`<li><a href="/foto/${ hsl2.data[i].sk}" class="btn btn-dark btn-sm btn-embossed" download>Download SK (TTE)</a></li>`:''
     let e = `<li><a class="btn btn-danger btn-embossed btn-sm" href="/manajemen_master/data_jenazah/edit/${ hsl2.data[i].jenazah_id}/2" role="button" >Edit Jenazah</a></li>`
     let f1 = hsl2.data[i].foto_ktp_pemohon?`<li><a href="/foto/${hsl2.data[i].foto_ktp_pemohon}" target="_blank">KTP Ahli Waris</a></li>`:''
     let f2 = hsl2.data[i].foto_ktp_jenazah?`<li><a href="/foto/${hsl2.data[i].foto_ktp_jenazah}" target="_blank">KTP Jenazah</a></li>`:''
@@ -446,11 +444,13 @@
                 </td>
                 <td>
                   <center>
-                    <ul class="list-inline" style="text-align: center;">
+                    <ul class="list-inline" style="text-align: center;margin-bottom:5px;">
                       ${a}
                       ${b}
                       ${c}
                       ${d}
+                    </ul>
+                    <ul class="list-inline" style="text-align: center;">
                       ${f}
                       ${e}
                    
