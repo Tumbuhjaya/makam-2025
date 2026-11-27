@@ -181,6 +181,28 @@
   </div>
 </div>
 
+<div class="modal fade" id="modalUploadSkTte" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Upload SK yang telah di TTE</h4>
+      </div>
+      <div class="modal-body">
+        <form action="/manajemen_perijinan/uploadSKTTE" method="post" enctype="multipart/form-data" onsubmit="return confirm('SK akan terbit dan notifikasi email dikirim ke pemohon. Lanjutkan?')">
+          <div class="form-group">
+            <label>File SK TTE (PDF)</label>
+            <input type="file" class="form-control" name="sk_tte" accept=".pdf" required>
+            <input type="text" name="id" id="dokument_id_tte" hidden>
+            <input type="text" name="jns_permohonan" value="4" hidden>
+          </div>
+          <button type="submit" class="btn btn-info btn-embossed">Simpan</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="modal fade modal-cetak-sk" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -266,6 +288,9 @@
       })
 
     })
+    $(document).on("click", ".upload_sk_tte", function () {
+            $('#dokument_id_tte').val($(this).data('dokument'))
+        });
     $(document).on("click", ".upload_sk", function () {
             let id = $(this).data('dokument');
             console.log(id);
@@ -406,8 +431,12 @@
     let a = hsl2.user.is_admin==1?`<li><button style="margin-right:0;" class="btn btn-warning btn-embossed btn-sm cetak_sk"  data-jenazah_id="${ hsl2.data[i].jenazah_id}" data-juuid="${ hsl2.data[i].juuid}" data-id="${ hsl2.data[i].perpanjangan_id}"  data-dokument_id="${ hsl2.data[i].dokument_id}"  data-toggle="modal" data-target=".modal-cetak-sk">Buat Draft SK</button></li>`:''
     // let b = hsl2.data[i].cek=='true' && hsl2.user.is_admin==1&&hsl2.data[i].status_pembayaran == 'Sudah Dibayar'?`<li><a class="btn btn-success btn-embossed btn-sm" target="_blank" href="/manajemen_perijinan/pemakaman/cetak/${ hsl2.data[i].jenazah_id}" role="button" >Cetak Draft SK</a></li>`:''
     let b = hsl2.data[i].cek=='true' && hsl2.user.is_admin==1?`<li><a class="btn btn-success btn-embossed btn-sm" target="_blank" href="/manajemen_perijinan/pemakaman/cetak/${hsl2.data[i].juuid}" role="button">Cetak Draft SK</a></li>`:''
-    let c =  hsl2.data[i].periode!=0 && hsl2.data[i].status_pembayaran == 'Sudah Dibayar'?`<li><button class="btn btn-info btn-embossed btn-sm upload_sk" style="margin-right: 0;" role="button" style="margin-right: 0;" data-dokument="${ hsl2.data[i].dokument_id}" data-toggle="modal"  data-target="#exampleModal">Upload Draft SK (TTE)</button></li>`:''
-    let d = hsl2.data[i].sk?`<li><a href="/foto/${ hsl2.data[i].sk}" class="btn btn-dark btn-sm btn-embossed" download>Download SK (TTE)</a></li>`:''
+    // upload draft SK hanya untuk superadmin
+    let c = hsl2.data[i].periode!=0 && hsl2.user.is_admin==1 && hsl2.data[i].status_pembayaran == 'Sudah Dibayar'?`<li><button class="btn btn-info btn-embossed btn-sm upload_sk" style="margin-right: 0;" role="button" data-dokument="${ hsl2.data[i].dokument_id}" data-toggle="modal"  data-target="#exampleModal">Upload Draft SK (TTE)</button></li>`:''
+    // upload SK TTE muncul bersamaan dengan Download SK (setelah Ka. UPTD menyetujui TTE), untuk pengelola TPU / superadmin
+    let c2 = hsl2.data[i].sk && hsl2.data[i].status_tte==2 && (hsl2.user.is_admin==0 || hsl2.user.is_admin==1) ?`<li><button class="btn btn-success btn-embossed btn-sm upload_sk_tte" role="button" style="margin-right: 0;" data-dokument="${ hsl2.data[i].dokument_id}" data-toggle="modal" data-target="#modalUploadSkTte">Upload SK TTE</button></li>`:''
+    // download SK hanya muncul setelah TTE selesai (disetujui)
+    let d = hsl2.data[i].sk&&hsl2.data[i].status_tte==2?`<li><a href="/foto/${ hsl2.data[i].sk}" class="btn btn-dark btn-sm btn-embossed" download>Download SK (TTE)</a></li>`:''
     let e = `<li><a class="btn btn-danger btn-embossed btn-sm" href="/manajemen_master/data_jenazah/edit/${ hsl2.data[i].jenazah_id}/2" role="button" >Edit Jenazah</a></li>`
     let f1 = hsl2.data[i].foto_ktp_pemohon?`<li><a href="/foto/${hsl2.data[i].foto_ktp_pemohon}" target="_blank">KTP Ahli Waris</a></li>`:''
     let f2 = hsl2.data[i].foto_ktp_jenazah?`<li><a href="/foto/${hsl2.data[i].foto_ktp_jenazah}" target="_blank">KTP Jenazah</a></li>`:''
@@ -448,6 +477,7 @@
                       ${a}
                       ${b}
                       ${c}
+                      ${c2}
                       ${d}
                     </ul>
                     <ul class="list-inline" style="text-align: center;">

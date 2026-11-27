@@ -461,8 +461,8 @@
     
     // upload SK hanya untuk superadmin, admin TPU tidak boleh upload
     let c = hsl2.data[i].periode!=0 && hsl2.user.is_admin==1 ?`<li><button class="btn btn-info btn-embossed btn-sm upload_sk" role="button" style="margin-right: 0;" data-dokument="${ hsl2.data[i].dokument_id}" data-toggle="modal"  data-target="#exampleModal">Upload Draft SK (TTE)</button></li>`:''
-    // upload SK yang sudah di TTE, hanya superadmin dan selama SK belum terbit
-    let c2 = hsl2.data[i].periode!=0 && hsl2.user.is_admin==1 && hsl2.data[i].status_tte!=2 ?`<li><button class="btn btn-success btn-embossed btn-sm upload_sk_tte" role="button" style="margin-right: 0;" data-dokument="${ hsl2.data[i].dokument_id}" data-toggle="modal" data-target="#modalUploadSkTte">Upload SK TTE</button></li>`:''
+    // upload SK TTE muncul bersamaan dengan Download SK (setelah Ka. UPTD menyetujui TTE), untuk pengelola TPU / superadmin
+    let c2 = hsl2.data[i].sk && hsl2.data[i].status_tte==2 && (hsl2.user.is_admin==0 || hsl2.user.is_admin==1) ?`<li><button class="btn btn-success btn-embossed btn-sm upload_sk_tte" role="button" style="margin-right: 0;" data-dokument="${ hsl2.data[i].dokument_id}" data-toggle="modal" data-target="#modalUploadSkTte">Upload SK TTE</button></li>`:''
     // download SK hanya muncul setelah TTE selesai (disetujui)
     let d = hsl2.data[i].sk&&hsl2.data[i].status_tte==2?`<li><a href="/foto/${ hsl2.data[i].sk}" class="btn btn-dark btn-sm btn-embossed" download>Download SK (TTE)</a></li>`:''
     let e = hsl2.data[i].periode == 0&&hsl2.data[i].status != 2?`<li><a href="/manajemen_perijinan/pemakaman/edit/${ hsl2.data[i].jenazah_id}" class="btn btn-warning btn-sm btn-embossed">Edit</a></li>`:''

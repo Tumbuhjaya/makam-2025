@@ -867,7 +867,7 @@ value.push(`%${cari}%`)
   when p2.status_pembayaran = 0  then 'Belum Dibayar'
   when p2.status_pembayaran = 1  then 'Sudah Dibayar'
   END as status_pembayaran,DATE_FORMAT(p2.tanggal_surat , '%d-%m-%Y') as tanggal_surat,DATE_FORMAT(p2.tanggal_berlaku_surat , '%d-%m-%Y') as tanggal_berlaku_surat
-  ,DATE_FORMAT(j.tanggal_dimakamkan , '%d-%m-%Y') as inserted,DATE_FORMAT(p2.inserted_perpanjangan , '%d-%m-%Y') as inserted_perpanjangan ,DATE_FORMAT(j.tanggal_meninggal  , '%d-%m-%Y') as tanggal_meninggal,DATE_FORMAT(j.tanggal_dimakamkan  , '%d-%m-%Y') as tanggal_dimakamkan,p.id as permohonan_id , j.id as jenazah_id , d.id as dokument_id ,p2.id as perpanjangan_id `
+  ,DATE_FORMAT(j.tanggal_dimakamkan , '%d-%m-%Y') as inserted,DATE_FORMAT(p2.inserted_perpanjangan , '%d-%m-%Y') as inserted_perpanjangan ,DATE_FORMAT(j.tanggal_meninggal  , '%d-%m-%Y') as tanggal_meninggal,DATE_FORMAT(j.tanggal_dimakamkan  , '%d-%m-%Y') as tanggal_dimakamkan,p.id as permohonan_id , j.id as jenazah_id , d.id as dokument_id ,p2.id as perpanjangan_id,d.status_tte as status_tte `
  if(count){
   sql = ' count(*) as jml'
  }
@@ -905,7 +905,7 @@ router.post(`/perpanjangan_makam`,async function (req,res) {
 
 router.post(`/uploadSK`,cek_login,upload.fields([{name:'sk',maxCount:1}]),async function (req,res) {
   // pemakaman jenazah: upload SK hanya oleh superadmin
-  if (req.body.jns_permohonan == 0 && req.user[0].is_admin != 1) {
+  if ((req.body.jns_permohonan == 0 || req.body.jns_permohonan == 4) && req.user[0].is_admin != 1) {
     return res.status(403).send('Hanya superadmin yang dapat upload SK')
   }
   const dokument = {}
@@ -918,7 +918,7 @@ router.post(`/uploadSK`,cek_login,upload.fields([{name:'sk',maxCount:1}]),async 
     }
   }
   // draft baru diupload -> proses TTE dimulai dari awal
-  if (jns_permohonan == 0) {
+  if (jns_permohonan == 0 || jns_permohonan == 4) {
     dokument.status_tte = 0
   }
     const { v4: uuidv4 } = await import('uuid');
@@ -953,15 +953,8 @@ await sql_enak("dokument")
 
     res.redirect(`/manajemen_perijinan/pemakaman`)
   } else if (jns_permohonan == 4) {
-    // let text = `SK ijin pemakaman tumpang telah terbit. Silahkan klik link berikut "https://makam.semarangkota.go.id/manajemen_perijinan/pemakaman/cetak/${data[0][0].jenazah_id}"`
-    // let text = `Surat Keputusan (SK) ijin pemakaman tumpang telah terbit. Silahkan download/lihat file tersebut melalui link berikut ini : "https://makam.semarangkota.go.id/foto/${nama_file}"`
-    // let text = [`Surat Keputusan (SK) ijin pemakaman tumpang`,`Surat Keputusan (SK) ijin pemakaman tumpang telah terbit. Silahkan download/lihat file tersebut melalui tombol dibawah ini<br/><a href="https://makam.semarangkota.go.id/foto/${nama_file}" target="_blank" class="button" style="color:white">Download/Lihat</a>"`]
-   let text= `https://makam.semarangkota.go.id/foto/${nama_file}`
-
-    email(data[0][0].email,'Surat Keputusan (SK) ijin pemakaman tumpang terbit',text)
-    let hasilWa =await kirimWa(data[0][0].hp,text)
-
-    res.redirect(`/manajemen_perijinan/pemakaman_tumpang?cetak=`+data[0][0].juuid)
+    // notifikasi SK terbit tidak dikirim di sini, karena proses TTE baru dimulai
+    res.redirect(`/manajemen_perijinan/pemakaman_tumpang`)
   }
   else if (jns_permohonan == 2) {
     // let text = `Surat Keputusan (SK) ijin pesan tempat makam telah terbit. Silahkan download/lihat file tersebut melalui link berikut ini : "https://makam.semarangkota.go.id/foto/${nama_file}"`
@@ -975,13 +968,15 @@ await sql_enak("dokument")
     res.redirect(`/manajemen_perijinan/pesan_tempat_makam?cetak=`+data[0][0].juuid)
   }
 })
-// upload SK yang sudah di TTE (di luar aplikasi) -> SK terbit, email ke pemohon, download SK muncul untuk pengelola TPU
+// pengelola TPU download SK (setelah Ka. UPTD menyetujui TTE), lalu upload SK TTE -> email 'SK terbit' + file SK ke pemohon
 router.post(`/uploadSKTTE`,cek_login,upload.fields([{name:'sk_tte',maxCount:1}]),async function (req,res) {
-  if (req.user[0].is_admin != 1) {
-    return res.status(403).send('Hanya superadmin yang dapat upload SK TTE')
+  if (req.user[0].is_admin != 0 && req.user[0].is_admin != 1) {
+    return res.status(403).send('Anda tidak berhak upload SK TTE')
   }
+  let redirectUrl = req.body.jns_permohonan == 4 ? `/manajemen_perijinan/pemakaman_tumpang` : `/manajemen_perijinan/pemakaman`
+  let jenisSk = req.body.jns_permohonan == 4 ? 'ijin pemakaman tumpang' : 'ijin penggunaan tanah makam/pemakaman jenazah'
   if (!req.files || !req.files["sk_tte"]) {
-    return res.redirect(`/manajemen_perijinan/pemakaman`)
+    return res.redirect(redirectUrl)
   }
   let nama_file = req.files["sk_tte"][0].filename
 
@@ -995,26 +990,26 @@ router.post(`/uploadSKTTE`,cek_login,upload.fields([{name:'sk_tte',maxCount:1}])
   log.log_id = luuid
   log.log_uuid = luuid
   log.luuid= luuid
-  log.riwayat = 'SK yang telah di TTE diupload, SK terbit'
+  log.riwayat = 'SK TTE diupload oleh pengelola, notifikasi SK terbit dikirim ke pemohon'
   log.t = 'dokument'
   log.user_uuid = req.user[0].id_user
   await sql_enak.insert(log).into('log')
 
   await sql_enak("dokument")
   .where("id", "=", req.body.id)
-  .update({sk:nama_file,status_tte:2})
+  .update({sk:nama_file})
 
   let data = await sql_enak.raw(`SELECT p.email FROM dokument d LEFT JOIN permohonan p ON p.jenazah_id = d.jenazah_id WHERE p.deleted = 0 AND d.id = ? LIMIT 1`, [req.body.id])
   if (data[0][0] && data[0][0].email) {
     let linkSk = process.env.APP_PUBLIC_URL + '/foto/' + nama_file
     let fileBuffer = await fileStorage.getFile(nama_file)
     kirimEmail(data[0][0].email,
-      'Surat Keputusan (SK) ijin penggunaan tanah makam/pemakaman jenazah terbit',
-      `Surat Keputusan (SK) ijin penggunaan tanah makam/pemakaman jenazah telah terbit. File SK terlampir pada email ini, atau dapat diunduh melalui link berikut : <a href="${linkSk}" target="_blank">${linkSk}</a>`,
+      `Surat Keputusan (SK) ${jenisSk} terbit`,
+      `Surat Keputusan (SK) ${jenisSk} telah terbit. File SK terlampir pada email ini, atau dapat diunduh melalui link berikut : <a href="${linkSk}" target="_blank">${linkSk}</a>`,
       [{ filename: nama_file, content: fileBuffer }])
   }
 
-  res.redirect(`/manajemen_perijinan/pemakaman`)
+  res.redirect(redirectUrl)
 })
 router.post(`/uploadSKPerpanjangan`,upload.fields([{name:'sk_perpanjangan',maxCount:1}]),async function (req,res) {
   const perpanjangan = {}  
