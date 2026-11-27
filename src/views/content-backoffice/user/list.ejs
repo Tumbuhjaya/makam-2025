@@ -34,7 +34,7 @@
               <tr>
                 <td><%= i+1 %>.</td>
                 <td><%= data[i]['username'] %></td>
-                <td><%if( data[i]['is_admin']==1){%>Superadmin<%}else if( data[i]['is_admin']==0){%>Pengelola TPU<%}%></td>
+                <td><%if( data[i]['is_admin']==1){%>Superadmin<%}else if( data[i]['is_admin']==2){%>Kepala UPTD<%}else if( data[i]['is_admin']==0){%>Pengelola TPU<%}%></td>
                 <td><%if( data[i]['tpu']){%><%= data[i]['tpu'] %><%}%></td>
                 <td>
                   <ul class="list-inline">
