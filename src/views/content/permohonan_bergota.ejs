@@ -2568,7 +2568,7 @@ $.get(`/permohonan_ijin/perpanjangan/${pin}/${tipe}`,function (data) {
          
             
             // $.get(`/permohonan_ijin/subblokByBlok/${x}/${g}`, function (data) {   
-                $.get(`/permohonan_ijin/subblokByBlok?blok=${x}&master_makam_id=${makamm}&agama=${g}`, function (data) {   
+                $.get(`/permohonan_ijin/subblokByBlok?non_id=1&blok=${x}&master_makam_id=${makamm}&agama=${g}`, function (data) {
                     console.log(`${x}&master_makam_id=${makamm}&agama=${g}`, data)
                 data.data.sort((a,b)=>a.subblok.substring(1,a.subblok.length)-b.subblok.substring(1,b.subblok.length))
                 // if ( $( "#lokasi" ).val()==5819) {
